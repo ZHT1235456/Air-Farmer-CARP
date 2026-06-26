@@ -69,6 +69,9 @@ export class SimulationEngine {
   private seeded = new Set<string>();
   private dronePos: Point2D;
   private heading = 0;
+  private avoidDir: Point2D | null = null;
+  private avoidSide = 1;
+  private avoidSegIndex = -1;
   private routeOrder: string[];
 
   constructor(plan: PlanResult, private drone: DroneParams, private obstacles: Obstacle[] = []) {
@@ -113,6 +116,9 @@ export class SimulationEngine {
     this.seeded.clear();
     this.dronePos = this.segs[0] ? { ...this.segs[0].from } : { x: 0, y: 0 };
     this.heading = 0;
+    this.avoidDir = null;
+    this.avoidSide = 1;
+    this.avoidSegIndex = -1;
     this.playback = this.segs.length === 0 ? "completed" : "idle";
   }
 
@@ -125,6 +131,8 @@ export class SimulationEngine {
     this.dronePos = { ...seg.to };
     this.segDist = 0;
     this.segTime = 0;
+    this.avoidDir = null;
+    this.avoidSegIndex = -1;
     this.segIndex += 1;
     if (seg.type === "return") {
       if (isLast) this.playback = "completed";
@@ -132,6 +140,16 @@ export class SimulationEngine {
     } else if (isLast) {
       this.playback = "completed";
     }
+  }
+
+  private prepareAvoidance(seg: Seg): void {
+    if (this.avoidSegIndex === this.segIndex) return;
+    this.avoidSegIndex = this.segIndex;
+    this.avoidDir = null;
+
+    const dx = seg.to.x - seg.from.x;
+    const dy = seg.to.y - seg.from.y;
+    this.avoidSide = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 1 : -1) : dy >= 0 ? -1 : 1;
   }
 
   advance(dt: number, speedMultiplier: number): void {
@@ -171,6 +189,7 @@ export class SimulationEngine {
       } else {
         // 空飞 / 返航：CBF 避障朝目标，超时则直飞放行
         const step = Math.min(move, SUB_STEP);
+        this.prepareAvoidance(seg);
         const d2 = dist(this.dronePos, seg.to);
         if (d2 <= step) {
           this.distanceFlown += d2;
@@ -185,8 +204,12 @@ export class SimulationEngine {
             const m = Math.hypot(dx, dy) || 1;
             dir = { x: dx / m, y: dy / m };
           } else {
-            dir = cbfSteer(this.dronePos, seg.to, this.obstacles);
+            dir = cbfSteer(this.dronePos, seg.to, this.obstacles, {
+              previousDir: this.avoidDir,
+              sideBias: this.avoidSide,
+            });
           }
+          this.avoidDir = dir;
           this.dronePos = { x: this.dronePos.x + dir.x * step, y: this.dronePos.y + dir.y * step };
           this.distanceFlown += step;
           this.tripDist += step;
