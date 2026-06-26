@@ -70,8 +70,19 @@
   line-height: 1.4;
 }
 
+.algo-pill--pk {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+}
+
 @media (max-width: 320px) {
   .algo-selector {
     grid-template-columns: 1fr;
+  }
+  .algo-pill--pk {
+    grid-column: auto;
   }
 }

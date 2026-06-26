@@ -22,7 +22,7 @@ export default function AlgorithmSelector() {
           type="button"
           role="radio"
           aria-checked={mode === m.id}
-          className={"algo-pill" + (mode === m.id ? " is-active" : "")}
+          className={"algo-pill" + (mode === m.id ? " is-active" : "") + (m.pk ? " algo-pill--pk" : "")}
           onClick={() => setMode(m.id)}
         >
           <span className="algo-pill__row">

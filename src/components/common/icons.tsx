@@ -134,16 +134,14 @@ const PATHS: Record<IconName, ReactNode> = {
   ),
   slower: (
     <>
-      <path d="M4 12 a8 8 0 0 1 8 -8" />
-      <path d="M11 8 L12 4 L7 4" />
-      <path d="M4 20 L20 20" />
+      <path d="M11 6 L4 12 L11 18 Z" fill="currentColor" stroke="none" />
+      <path d="M20 6 L13 12 L20 18 Z" fill="currentColor" stroke="none" />
     </>
   ),
   faster: (
     <>
-      <path d="M20 12 a8 8 0 0 0 -8 -8" />
-      <path d="M13 8 L12 4 L17 4" />
-      <path d="M4 20 L20 20" />
+      <path d="M4 6 L11 12 L4 18 Z" fill="currentColor" stroke="none" />
+      <path d="M13 6 L20 12 L13 18 Z" fill="currentColor" stroke="none" />
     </>
   ),
   back: (

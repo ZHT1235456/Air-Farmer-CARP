@@ -126,11 +126,34 @@
 }
 
 .hero__scroll {
+  display: flex;
+  justify-content: center;
   margin-top: 56px;
-  text-align: center;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  color: var(--ink-faint);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--leaf-deep);
+}
+.hero__arrow {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: floaty 2.2s ease-in-out infinite;
+}
+.hero__arrow svg:last-child {
+  opacity: 0.5;
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(7px); }
+}
+.hero__scroll:hover {
+  color: var(--leaf);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__arrow { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

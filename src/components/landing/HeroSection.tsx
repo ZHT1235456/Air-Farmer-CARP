@@ -28,9 +28,6 @@ export default function HeroSection() {
             <button className="btn-primary" onClick={() => navigate("/scene")}>
               进入系统 <span className="arrow">→</span>
             </button>
-            <a className="btn-ghost" href="#modeling">
-              了解建模逻辑
-            </a>
           </div>
         </div>
 
@@ -39,9 +36,21 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="hero__scroll mono" aria-hidden="true">
-        ↓ 现实问题 · 建模 · 求解
-      </div>
+      <button
+        type="button"
+        className="hero__scroll"
+        aria-label="向下滚动查看更多"
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+      >
+        <span className="hero__arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9 L12 15 L18 9" />
+          </svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9 L12 15 L18 9" />
+          </svg>
+        </span>
+      </button>
     </section>
   );
 }

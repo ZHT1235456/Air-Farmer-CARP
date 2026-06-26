@@ -31,12 +31,12 @@ export default function Lighting({ center, size }: LightingProps) {
 
   return (
     <>
-      <hemisphereLight color={0xbcd6ff} groundColor={0x55452e} intensity={0.8} />
+      <hemisphereLight color={0xbcd6ff} groundColor={0x55452e} intensity={0.55} />
       <primitive object={target} />
       <directionalLight
         ref={dirRef}
         color={0xfff1d6}
-        intensity={2.0}
+        intensity={2.6}
         position={[cx + sun.x * dist, sun.y * dist, cz + sun.z * dist]}
         castShadow
         shadow-mapSize-width={2048}

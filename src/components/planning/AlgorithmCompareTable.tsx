@@ -42,50 +42,12 @@ export default function AlgorithmCompareTable({ output }: { output: PlanOutput }
     if (better) bestIdx = i;
   });
 
-  const exportCsv = () => {
-    const headers = [
-      "算法",
-      "总航程(m)",
-      "返航",
-      "覆盖率(%)",
-      "耗时(ms)",
-      "违反",
-      "综合成本",
-    ];
-    const lines = [headers.join(",")];
-    output.results.forEach((r, i) => {
-      lines.push(
-        [
-          MODE_SHORT[r.algorithm],
-          r.totalDistance.toFixed(1),
-          r.returnCount,
-          (r.coverageRate * 100).toFixed(1),
-          r.runtimeMs.toFixed(0),
-          r.violations.length,
-          composites[i].toFixed(precision),
-        ].join(",")
-      );
-    });
-    const blob = new Blob(["\uFEFF" + lines.join("\n")], {
-      type: "text/csv;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "algorithm-compare.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="compare-wrap">
       <div className="compare-bar">
         <span className="compare-hint mono">
           最优行以金色描边标注 · 点击行查看详情
         </span>
-        <button type="button" className="btn-ghost compare-export" onClick={exportCsv}>
-          导出 CSV
-        </button>
       </div>
       <table className="compare-table">
         <thead>

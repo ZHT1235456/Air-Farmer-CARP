@@ -1,11 +1,13 @@
 import { useMemo, useSyncExternalStore } from "react";
-import { Text, Billboard } from "@react-three/drei";
+import * as THREE from "three";
+import { Line, Text, Billboard } from "@react-three/drei";
 import type { PlanResult, Strip } from "../types/domain";
 import { simStore } from "../simulation/simStore";
 import { segmentTransform, to3 } from "./coords";
 
-const SEEDED_Y = 0.13;
-const CURRENT_Y = 0.18;
+const SEEDED_Y = 0.1;
+const CURRENT_Y = 0.16;
+const EDGE_Y = 0.2;
 const LABEL_Y = 4.5;
 
 const TRIP_PALETTE = [
@@ -20,8 +22,9 @@ const TRIP_PALETTE = [
 ];
 
 /**
- * 仿真航带逐趟展示：已播种航带墨绿覆盖；仅高亮当前趟待播航带，
+ * 仿真航带逐趟展示：已播种航带墨绿贴地覆盖；仅高亮当前趟待播航带，
  * 并在当前趟标注 Rn。切到下一趟时自动更新。
+ * 用贴地 plane 取代 box，俯视/斜视均能看到完整色面。
  */
 export default function SimRouteOverlay({ plan }: { plan: PlanResult }) {
   const snap = useSyncExternalStore(simStore.subscribe, simStore.get, simStore.get);
@@ -47,37 +50,76 @@ export default function SimRouteOverlay({ plan }: { plan: PlanResult }) {
 
   return (
     <group>
-      {/* 已播种航带：墨绿覆盖 */}
+      {/* 已播种航带：墨绿贴地覆盖 */}
       {[...seeded].map((id) => {
         const s = stripMap.get(id);
         if (!s) return null;
         const t = segmentTransform(s.start, s.end, SEEDED_Y);
         return (
-          <mesh key={`seed-${id}`} position={t.position} rotation={[0, t.rotationY, 0]}>
-            <boxGeometry args={[t.length, 0.08, 1.7]} />
-            <meshStandardMaterial color="#2f6d22" roughness={0.85} emissive="#1f4a16" emissiveIntensity={0.15} />
-          </mesh>
-        );
-      })}
-
-      {/* 当前趟待播航带：金/趟色高亮 */}
-      {currentRoute?.strips.map((s) => {
-        if (seeded.has(s.id)) return null;
-        const t = segmentTransform(s.start, s.end, CURRENT_Y);
-        const isCurrent = s.id === currentId;
-        return (
-          <mesh key={`cur-${s.id}`} position={t.position} rotation={[0, t.rotationY, 0]}>
-            <boxGeometry args={[t.length, isCurrent ? 0.12 : 0.1, isCurrent ? 2.4 : 1.9]} />
+          <mesh
+            key={`seed-${id}`}
+            position={t.position}
+            rotation={[-Math.PI / 2, 0, t.rotationY]}
+          >
+            <planeGeometry args={[t.length, 1.7]} />
             <meshStandardMaterial
-              color={isCurrent ? "#f0c460" : tripColor}
-              emissive={isCurrent ? "#d9a441" : tripColor}
-              emissiveIntensity={isCurrent ? 0.6 : 0.3}
-              transparent={!isCurrent}
-              opacity={isCurrent ? 1 : 0.7}
+              color="#2f6d22"
+              roughness={0.85}
+              emissive="#1f4a16"
+              emissiveIntensity={0.18}
+              side={THREE.DoubleSide}
+              polygonOffset
+              polygonOffsetFactor={-2}
+              polygonOffsetUnits={-2}
             />
           </mesh>
         );
       })}
+
+{/* 当前趟待播航带：金/趟色贴地高亮（不透明，避免 snapshot 重渲染时透明排序抖动） */}
+      {currentRoute?.strips.map((s) => {
+        if (seeded.has(s.id)) return null;
+        const t = segmentTransform(s.start, s.end, CURRENT_Y);
+        const isCurrent = s.id === currentId;
+        const w = isCurrent ? 2.4 : 1.9;
+        return (
+          <mesh
+            key={`cur-${s.id}`}
+            position={t.position}
+            rotation={[-Math.PI / 2, 0, t.rotationY]}
+          >
+            <planeGeometry args={[t.length, w]} />
+            <meshStandardMaterial
+              color={isCurrent ? "#f0c460" : tripColor}
+              emissive={isCurrent ? "#d9a441" : tripColor}
+              emissiveIntensity={isCurrent ? 0.5 : 0.22}
+              side={THREE.DoubleSide}
+              polygonOffset
+              polygonOffsetFactor={-3}
+              polygonOffsetUnits={-3}
+            />
+          </mesh>
+        );
+      })}
+
+      {/* 当前条发光描边：补偿贴纸无厚度感，斜视更醒目 */}
+      {currentRoute?.strips
+        .filter((s) => s.id === currentId)
+        .map((s) => {
+          const a = to3(s.start, EDGE_Y).toArray() as [number, number, number];
+          const b = to3(s.end, EDGE_Y).toArray() as [number, number, number];
+          return (
+            <Line
+              key={`edge-${s.id}`}
+              points={[a, b]}
+              color="#f0c460"
+              lineWidth={3}
+              worldUnits
+              transparent
+              opacity={0.9}
+            />
+          );
+        })}
 
       {/* 当前趟标签 Rn */}
       {labelPos && (
