@@ -275,29 +275,6 @@ export default function GuidePage() {
     <div className="guide">
       <div className="guide__topbar">
         <span className="eyebrow">User Guide · 操作说明</span>
-        <div className="guide__nav">
-          <button
-            type="button"
-            className="guide__navbtn"
-            aria-label="上一页"
-            disabled={page === 0}
-            onClick={() => go(-1)}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6 L9 12 L15 18" /></svg>
-          </button>
-          <span className="guide__pager mono">
-            {page + 1} / {total}
-          </span>
-          <button
-            type="button"
-            className="guide__navbtn"
-            aria-label="下一页"
-            disabled={page === total - 1}
-            onClick={() => go(1)}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6 L15 12 L9 18" /></svg>
-          </button>
-        </div>
       </div>
 
       <div className="book" role="region" aria-label="操作说明书">

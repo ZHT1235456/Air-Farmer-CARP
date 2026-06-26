@@ -24,38 +24,7 @@
   margin-bottom: 14px;
   flex: 0 0 auto;
 }
-.guide__nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.guide__navbtn {
-  width: 34px;
-  height: 34px;
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  color: var(--leaf-deep);
-  cursor: pointer;
-  transition: border-color 0.16s var(--ease-soft), background 0.16s var(--ease-soft),
-    transform 0.12s var(--ease-soft);
-}
-.guide__navbtn:hover:not(:disabled) {
-  border-color: var(--leaf);
-  background: rgba(90, 125, 79, 0.14);
-  transform: translateY(-1px);
-}
-.guide__navbtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-.guide__pager {
-  font-size: 0.84rem;
-  color: var(--ink-soft);
-  letter-spacing: 0.1em;
-}
+
 
 /* ---------- 书本 ---------- */
 .book {
@@ -183,37 +152,30 @@
   bottom: 16px;
   font-size: 0.8rem;
   color: var(--ink-faint);
+  text-shadow: 0 0 6px var(--paper-card), 0 0 12px var(--paper-card);
 }
 
-/* 角落翻页热区 */
+/* 角落翻页热区（按钮隐藏，点击仍可翻页） */
 .book__corner {
   position: absolute;
   bottom: 10px;
-  width: 30px;
-  height: 30px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
-  color: var(--leaf-deep);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
   cursor: pointer;
   z-index: 4;
-  opacity: 0.5;
-  transition: opacity 0.16s var(--ease-soft), border-color 0.16s var(--ease-soft),
-    background 0.16s var(--ease-soft);
-}
-.book__corner:hover:not(:disabled) {
-  opacity: 1;
-  border-color: var(--leaf);
-  background: rgba(90, 125, 79, 0.16);
+  opacity: 0;
 }
 .book__corner:disabled {
-  opacity: 0.2;
   cursor: not-allowed;
 }
-.book__corner--prev { left: 14px; }
-.book__corner--next { right: 14px; }
+.book__corner--prev { left: 0; }
+.book__corner--next { right: 0; }
 
 .guide__hint {
   margin-top: 10px;
