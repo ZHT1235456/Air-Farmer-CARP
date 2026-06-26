@@ -1,0 +1,178 @@
+:root {
+  --side-l: 308px;
+  --side-r: 300px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: var(--side-l) 1fr var(--side-r);
+  height: calc(100vh - var(--topbar-h));
+  background-color: var(--paper-2);
+  background-image: var(--grain-pattern), linear-gradient(180deg, var(--paper-2), var(--paper-3));
+  background-blend-mode: multiply, normal;
+}
+.workspace--no-right {
+  grid-template-columns: var(--side-l) 1fr;
+}
+/* 加宽右栏（航线规划页：300 → 450） */
+.workspace--wide-right {
+  --side-r: 450px;
+}
+
+/* ---------- 侧栏 ---------- */
+.workspace__side {
+  height: 100%;
+  overflow-y: auto;
+  background: var(--paper);
+  padding: 20px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.workspace__side--left {
+  border-right: 1px solid var(--line);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+.workspace__side--right {
+  border-left: 1px solid var(--line);
+  box-shadow: -1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- 中央视口 ---------- */
+.workspace__stage {
+  position: relative;
+  padding: 14px;
+  min-width: 0;
+  min-height: 0;
+}
+.workspace__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 18px 40px -22px rgba(42, 38, 32, 0.4);
+  background: #cdd6cf;
+}
+.workspace__viewport canvas {
+  display: block;
+}
+
+/* ---------- 侧栏头部 / 分组 ---------- */
+.side-header {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.side-header__title {
+  font-size: 1.4rem;
+  margin-top: 6px;
+}
+
+.side-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.side-section--scroll {
+  min-height: 0;
+}
+.side-section__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--soil-deep);
+  font-family: var(--font-mono);
+}
+.side-section__label::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px 6px 2px 6px;
+  background: linear-gradient(135deg, var(--leaf), var(--seed-gold));
+  transform: rotate(8deg);
+  flex: 0 0 auto;
+}
+
+/* ---------- 侧栏共享内容 ---------- */
+.side-desc {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.side-hint {
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.stat-list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.86rem;
+}
+.stat-row dt {
+  color: var(--ink-soft);
+  flex: 0 0 auto;
+}
+.stat-row dd {
+  margin: 0;
+  text-align: right;
+  color: var(--ink);
+  font-size: 0.84rem;
+}
+
+/* ---------- 场景选择器 ---------- */
+.scenario-picker {
+  display: grid;
+  gap: 6px;
+}
+.scenario-picker__item {
+  text-align: left;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+.scenario-picker__item:hover {
+  border-color: var(--leaf-soft);
+  background: rgba(90, 125, 79, 0.08);
+  transform: translateX(2px);
+}
+.scenario-picker__item.is-active {
+  border-color: var(--leaf);
+  background: rgba(90, 125, 79, 0.16);
+  color: var(--leaf-deep);
+}
+
+/* ---------- 响应式：窄屏堆叠 ---------- */
+@media (max-width: 980px) {
+  .workspace,
+  .workspace--no-right {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    height: auto;
+    min-height: calc(100vh - var(--topbar-h));
+  }
+  .workspace__side {
+    max-height: none;
+  }
+  .workspace__stage {
+    height: 60vh;
+  }
+}

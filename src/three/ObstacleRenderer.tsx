@@ -51,6 +51,13 @@ function PolePoint({ o, pos }: { o: Obstacle; pos: Point2D }) {
         <boxGeometry args={[isTower ? 6 : 3.2, 0.22, 0.32]} />
         <meshStandardMaterial color={isTower ? "#71767d" : "#b9b9b9"} roughness={0.85} metalness={0.3} />
       </mesh>
+      {/* 绝缘子 */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} position={[s * (isTower ? 2.6 : 1.4), h - 0.55, 0]} castShadow>
+          <cylinderGeometry args={[0.12, 0.16, 0.4, 8]} />
+          <meshStandardMaterial color="#e8e4da" roughness={0.6} metalness={0.1} />
+        </mesh>
+      ))}
       {isTower && (
         <mesh position={[0, h - 2.4, 0]} castShadow>
           <boxGeometry args={[4.6, 0.22, 0.32]} />

@@ -9,16 +9,16 @@ export default function AlgorithmSelector() {
   const setMode = useAppStore((s) => s.setAlgorithmMode);
 
   return (
-    <div className="algo-selector">
+    <select
+      className="dropdown"
+      value={mode}
+      onChange={(e) => setMode(e.target.value as AlgorithmMode)}
+    >
       {MODES.map((m) => (
-        <button
-          key={m}
-          className={"algo-pill" + (m === mode ? " is-active" : "")}
-          onClick={() => setMode(m)}
-        >
+        <option key={m} value={m}>
           {MODE_LABELS[m]}
-        </button>
+        </option>
       ))}
-    </div>
+    </select>
   );
 }

@@ -17,8 +17,8 @@ export default function DepotMarker({ depot }: { depot: Point2D }) {
         <meshStandardMaterial color="#f2f2f2" roughness={0.6} metalness={0.1} side={2} />
       </mesh>
 
-      {/* 料仓（偏置一侧，避免压住停机坪中心） */}
-      <group position={[0, 0, -5.5]}>
+      {/* 料仓（置于 3 点钟方向，避免压住停机坪中心） */}
+      <group position={[5.5, 0, 0]}>
         {/* 桶体 */}
         <mesh position={[0, 2.6, 0]} castShadow>
           <cylinderGeometry args={[1.6, 1.6, 3.2, 24]} />

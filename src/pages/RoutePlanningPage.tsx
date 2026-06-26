@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAppStore, useCurrentScenario } from "../store/appStore";
 import { rebuildScenario } from "../scenarios/scenarioFactory";
 import { usePlanner } from "../hooks/usePlanner";
+import Workspace, { SidebarSection, SidebarHeader } from "../components/layout/Workspace";
+import ScenarioSelect from "../components/layout/ScenarioSelect";
 import WorldCanvas from "../three/WorldCanvas";
 import RouteRenderer from "../three/RouteRenderer";
 import DroneParamPanel from "../components/planning/DroneParamPanel";
@@ -20,9 +22,7 @@ export default function RoutePlanningPage() {
   const setPlanOutput = useAppStore((s) => s.setPlanOutput);
 
   const { planning, run } = usePlanner();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // 有效场景：按当前参数重算航带，同时驱动三维世界与算法
   const effectiveScenario = useMemo(
     () => rebuildScenario(baseScenario, drone),
     [baseScenario, drone]
@@ -37,65 +37,51 @@ export default function RoutePlanningPage() {
     run(effectiveScenario, drone, mode, 42, (output) => setPlanOutput(output));
   };
 
+  const left = (
+    <>
+      <SidebarHeader eyebrow="Route Planning · 航线规划" title={baseScenario.name} />
+      <SidebarSection title="农田场景">
+        <ScenarioSelect />
+      </SidebarSection>
+      <SidebarSection title="无人机参数">
+        <DroneParamPanel />
+      </SidebarSection>
+      <SidebarSection title="算法模式">
+        <AlgorithmSelector />
+      </SidebarSection>
+      <button className="btn-primary plan-generate" onClick={generate} disabled={planning}>
+        {planning ? "正在求解…" : "生成航线"}
+      </button>
+    </>
+  );
+
+  const right = (
+    <>
+      <PlanResultPanel />
+      {planOutput && planOutput.results.length > 1 && (
+        <SidebarSection title="算法指标对比">
+          <AlgorithmCompareTable output={planOutput} />
+        </SidebarSection>
+      )}
+      {planOutput && (
+        <SidebarSection title="收敛曲线">
+          <ConvergenceChart output={planOutput} />
+        </SidebarSection>
+      )}
+    </>
+  );
+
   return (
-    <div className="plan-page">
+    <Workspace left={left} right={right} className="workspace--wide-right">
       <WorldCanvas scenario={effectiveScenario}>
         <RouteRenderer plan={selectedResult} />
       </WorldCanvas>
-
-      {/* 左：参数 + 算法 + 生成 */}
-      <aside className="plan-left">
-        <span className="eyebrow">Route Planning · 航线规划</span>
-        <h1 className="plan-left__title">{baseScenario.name}</h1>
-
-        <div className="plan-section">
-          <span className="plan-section__label">无人机参数</span>
-          <DroneParamPanel />
-        </div>
-
-        <div className="plan-section">
-          <span className="plan-section__label">算法模式</span>
-          <AlgorithmSelector />
-        </div>
-
-        <button className="btn-primary plan-generate" onClick={generate} disabled={planning}>
-          {planning ? "正在求解…" : "生成航线"}
-        </button>
-      </aside>
-
-      {/* 右：结果指标 */}
-      <aside className="plan-right">
-        <PlanResultPanel drawerOpen={drawerOpen} onToggleDrawer={() => setDrawerOpen((v) => !v)} />
-      </aside>
-
-      {/* 计算遮罩 */}
       {planning && (
         <div className="plan-loading">
           <div className="plan-spinner" />
           <span className="mono">正在后台求解航线…</span>
         </div>
       )}
-
-      {/* 底部抽屉：对比表 + 收敛曲线 */}
-      {planOutput && (
-        <div className={"plan-drawer" + (drawerOpen ? " is-open" : "")}>
-          <button className="plan-drawer__handle" onClick={() => setDrawerOpen((v) => !v)}>
-            {drawerOpen ? "▼ 收起" : "▲ 算法对比 / 收敛曲线"}
-          </button>
-          {drawerOpen && (
-            <div className="plan-drawer__body">
-              <div className="plan-drawer__col">
-                <h3 className="plan-drawer__title">指标对比</h3>
-                <AlgorithmCompareTable output={planOutput} />
-              </div>
-              <div className="plan-drawer__col">
-                <h3 className="plan-drawer__title">收敛曲线</h3>
-                <ConvergenceChart output={planOutput} />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    </Workspace>
   );
 }

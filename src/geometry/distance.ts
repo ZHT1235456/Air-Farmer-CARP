@@ -84,3 +84,14 @@ function onSegment(a: Point2D, b: Point2D, p: Point2D): boolean {
 export function lerp(a: Point2D, b: Point2D, t: number): Point2D {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }
+
+/** 线段 [a,b] 上距 p 最近的点 */
+export function closestPointOnSegment(p: Point2D, a: Point2D, b: Point2D): Point2D {
+  const abx = b.x - a.x;
+  const aby = b.y - a.y;
+  const len2 = abx * abx + aby * aby;
+  if (len2 === 0) return { x: a.x, y: a.y };
+  let t = ((p.x - a.x) * abx + (p.y - a.y) * aby) / len2;
+  t = Math.max(0, Math.min(1, t));
+  return { x: a.x + t * abx, y: a.y + t * aby };
+}

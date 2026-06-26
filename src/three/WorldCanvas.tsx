@@ -11,10 +11,23 @@ interface WorldCanvasProps {
   /** 叠加在世界之上的三维内容（如航线、无人机） */
   children?: ReactNode;
   onPointerMissed?: () => void;
+  /** 轨道控制是否启用（跟踪视角时关闭） */
+  orbitEnabled?: boolean;
+  /** 已播种航带集合 */
+  seededIds?: Set<string>;
+  /** 航带是否可点击 */
+  stripInteractive?: boolean;
 }
 
-/** 通用三维画布：写实世界 + 斜俯视相机；供场景预览与航线规划共用 */
-export default function WorldCanvas({ scenario, children, onPointerMissed }: WorldCanvasProps) {
+/** 通用三维画布：写实世界 + 斜俯视相机；供场景预览 / 规划 / 仿真共用 */
+export default function WorldCanvas({
+  scenario,
+  children,
+  onPointerMissed,
+  orbitEnabled = true,
+  seededIds,
+  stripInteractive,
+}: WorldCanvasProps) {
   const bounds = useMemo(() => computeSceneBounds(scenario), [scenario]);
   const pose = useMemo(() => computeCameraPose(bounds), [bounds]);
   const size = bounds.size;
@@ -37,6 +50,7 @@ export default function WorldCanvas({ scenario, children, onPointerMissed }: Wor
       <PerspectiveCamera makeDefault fov={52} near={0.5} far={size * 12} position={pose.position} />
       <OrbitControls
         makeDefault
+        enabled={orbitEnabled}
         target={pose.target}
         enableDamping
         dampingFactor={0.05}
@@ -48,7 +62,9 @@ export default function WorldCanvas({ scenario, children, onPointerMissed }: Wor
         maxDistance={pose.maxDistance}
       />
 
-      <RealisticWorld scenario={scenario}>{children}</RealisticWorld>
+      <RealisticWorld scenario={scenario} seededIds={seededIds} stripInteractive={stripInteractive}>
+        {children}
+      </RealisticWorld>
     </Canvas>
   );
 }

@@ -19,9 +19,13 @@ import EnvDressing from "./EnvDressing";
 export default function RealisticWorld({
   scenario,
   children,
+  seededIds,
+  stripInteractive = true,
 }: {
   scenario: Scenario;
   children?: ReactNode;
+  seededIds?: Set<string>;
+  stripInteractive?: boolean;
 }) {
   const bounds = useMemo(() => computeSceneBounds(scenario), [scenario]);
   const strips = useMemo(
@@ -42,7 +46,7 @@ export default function RealisticWorld({
         <Bund key={`bund-${f.id}`} field={f} />
       ))}
 
-      <StripRenderer strips={strips} />
+      <StripRenderer strips={strips} seededIds={seededIds} interactive={stripInteractive} />
       <ObstacleRenderer obstacles={scenario.obstacles} />
       <DepotMarker depot={scenario.depot} />
       <EnvDressing bounds={bounds} depot={scenario.depot} />

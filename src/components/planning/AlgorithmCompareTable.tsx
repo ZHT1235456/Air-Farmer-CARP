@@ -5,18 +5,45 @@ import { compositeCost } from "./PlanResultPanel";
 
 const fmt = (n: number, d = 1) => n.toLocaleString("zh-CN", { maximumFractionDigits: d });
 
+const EPS = 1e-9;
+
+/** 找到能区分各综合成本的最小小数位数（最多 6 位） */
+function distinguishingPrecision(vals: number[]): number {
+  for (let d = 1; d <= 6; d++) {
+    let ok = true;
+    for (let i = 0; i < vals.length && ok; i++) {
+      for (let j = i + 1; j < vals.length; j++) {
+        if (Math.abs(vals[i] - vals[j]) > EPS && vals[i].toFixed(d) === vals[j].toFixed(d)) {
+          ok = false;
+          break;
+        }
+      }
+    }
+    if (ok) return d;
+  }
+  return 6;
+}
+
 export default function AlgorithmCompareTable({ output }: { output: PlanOutput }) {
   const selectResult = useAppStore((s) => s.selectResult);
   const selectedIndex = useAppStore((s) => s.selectedResultIndex);
 
-  // 找综合成本最小者高亮
   const composites = output.results.map((_, i) => compositeCost(output, i));
+  const precision = distinguishingPrecision(composites);
+
+  // 综合成本严格最小者最优；完全相等时取运行时间最短
   let bestIdx = 0;
-  composites.forEach((c, i) => {
-    if (c < composites[bestIdx]) bestIdx = i;
+  output.results.forEach((r, i) => {
+    const c = composites[i];
+    const bc = composites[bestIdx];
+    const better =
+      c < bc - EPS ||
+      (Math.abs(c - bc) <= EPS && r.runtimeMs < output.results[bestIdx].runtimeMs);
+    if (better) bestIdx = i;
   });
 
   return (
+    <div className="compare-wrap">
     <table className="compare-table">
       <thead>
         <tr>
@@ -44,10 +71,11 @@ export default function AlgorithmCompareTable({ output }: { output: PlanOutput }
             <td className="mono">{fmt(r.coverageRate * 100)}%</td>
             <td className="mono">{fmt(r.runtimeMs)}</td>
             <td className="mono">{r.violations.length}</td>
-            <td className="mono">{fmt(composites[i])}</td>
+            <td className="mono">{composites[i].toFixed(precision)}</td>
           </tr>
         ))}
       </tbody>
     </table>
+    </div>
   );
 }

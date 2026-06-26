@@ -11,12 +11,7 @@ export function compositeCost(output: PlanOutput, index: number): number {
   return conv && conv.length ? conv[conv.length - 1].objective : NaN;
 }
 
-interface Props {
-  drawerOpen: boolean;
-  onToggleDrawer: () => void;
-}
-
-export default function PlanResultPanel({ drawerOpen, onToggleDrawer }: Props) {
+export default function PlanResultPanel() {
   const navigate = useNavigate();
   const output = useAppStore((s) => s.planOutput);
   const selectedIndex = useAppStore((s) => s.selectedResultIndex);
@@ -77,9 +72,6 @@ export default function PlanResultPanel({ drawerOpen, onToggleDrawer }: Props) {
       )}
 
       <div className="result-actions">
-        <button className="btn-ghost" onClick={onToggleDrawer}>
-          {drawerOpen ? "收起对比/收敛" : "对比 / 收敛曲线"}
-        </button>
         <button
           className="btn-primary"
           onClick={() => {
