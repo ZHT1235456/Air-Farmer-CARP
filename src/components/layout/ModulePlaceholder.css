@@ -1,0 +1,64 @@
+.module-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 64px;
+  padding-bottom: 64px;
+  min-height: calc(100vh - var(--topbar-h));
+}
+
+.module-ph__card {
+  max-width: 620px;
+  width: 100%;
+  padding: 44px 46px;
+  text-align: left;
+}
+
+.module-ph__title {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin: 12px 0 14px;
+}
+
+.module-ph__goal {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin-bottom: 22px;
+}
+
+.module-ph__list {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.module-ph__list li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--ink);
+}
+
+.module-ph__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--leaf);
+  transform: rotate(45deg);
+}
+
+.module-ph__badge {
+  display: inline-block;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--soil-deep);
+  padding: 7px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: rgba(217, 164, 65, 0.1);
+}

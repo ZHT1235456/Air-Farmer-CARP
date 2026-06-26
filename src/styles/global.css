@@ -1,0 +1,234 @@
+/* ============================================================
+   空中农夫 · 设计系统
+   智慧农田有机科技：米白 + 麦绿 / 土褐 / 播种金
+   ============================================================ */
+
+:root {
+  /* 色板 */
+  --paper: #f5f3ec;
+  --paper-2: #ece7d9;
+  --paper-3: #e2dccb;
+  --ink: #2a2620;
+  --ink-soft: #5c554a;
+  --ink-faint: #8a8175;
+  --leaf: #5a7d4f;
+  --leaf-deep: #3f5c37;
+  --leaf-soft: #7c9a72;
+  --soil: #8b6f47;
+  --soil-deep: #6b5436;
+  --seed-gold: #d9a441;
+  --seed-gold-deep: #bd8826;
+  --line: rgba(42, 38, 32, 0.12);
+  --line-strong: rgba(42, 38, 32, 0.24);
+
+  /* 字体 */
+  --font-display: "Fraunces", "Noto Serif SC", Georgia, serif;
+  --font-body: "Hanken Grotesk", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* 间距与圆角 */
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --shadow-card: 0 1px 2px rgba(42, 38, 32, 0.04),
+    0 8px 24px -12px rgba(42, 38, 32, 0.18);
+  --shadow-lift: 0 2px 4px rgba(42, 38, 32, 0.06),
+    0 18px 40px -16px rgba(42, 38, 32, 0.28);
+
+  /* 布局 */
+  --maxw: 1180px;
+  --topbar-h: 60px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: var(--paper);
+  /* 麦田色径向光晕 + 极淡噪点氛围 */
+  background-image: radial-gradient(
+      900px 600px at 78% -8%,
+      rgba(217, 164, 65, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      820px 560px at 6% 4%,
+      rgba(90, 125, 79, 0.14),
+      transparent 58%
+    ),
+    radial-gradient(
+      700px 700px at 50% 116%,
+      rgba(139, 111, 71, 0.1),
+      transparent 60%
+    );
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+/* 全局细噪点叠层 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* 等宽标签：用于编号 / 数据 / 公式辅助文字 */
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+/* 小标签 eyebrow */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--leaf-deep);
+}
+
+/* 容器 */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ---------- 按钮 ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.85em 1.7em;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--seed-gold), var(--seed-gold-deep));
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 22px -8px rgba(189, 136, 38, 0.7);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -10px rgba(189, 136, 38, 0.8);
+  filter: brightness(1.04);
+}
+.btn-primary .arrow {
+  transition: transform 0.18s ease;
+}
+.btn-primary:hover .arrow {
+  transform: translateX(4px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.7em 1.3em;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 500;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--leaf);
+  background: rgba(90, 125, 79, 0.08);
+}
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- 入场动画：staggered reveal ---------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+    opacity: 1;
+  }
+  .btn-primary,
+  .btn-primary:hover {
+    transform: none;
+  }
+}
+
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 3px solid var(--paper);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

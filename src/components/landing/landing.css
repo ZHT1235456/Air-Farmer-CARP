@@ -1,0 +1,458 @@
+/* ============================================================
+   首页落地页样式
+   ============================================================ */
+
+.landing {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ---------- 通用 section ---------- */
+.section {
+  padding: 92px 0;
+}
+.section--tint {
+  background: linear-gradient(
+    180deg,
+    rgba(236, 231, 217, 0.5),
+    rgba(236, 231, 217, 0)
+  );
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.section__head {
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+.section__title {
+  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+  margin: 14px 0 16px;
+}
+.section__sub {
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+  max-width: 640px;
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero {
+  position: relative;
+  padding: 84px 0 72px;
+  min-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero__title {
+  font-size: clamp(3.4rem, 9vw, 6.4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 18px 0 8px;
+  background: linear-gradient(135deg, var(--leaf-deep), var(--soil));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero__subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  color: var(--ink);
+  margin-bottom: 22px;
+  max-width: 30ch;
+}
+
+.hero__lead {
+  font-size: 1.08rem;
+  color: var(--ink-soft);
+  max-width: 46ch;
+  margin-bottom: 34px;
+}
+
+.hero__cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero__visual {
+  display: flex;
+  justify-content: center;
+}
+.hero__svg {
+  width: min(100%, 380px);
+  height: auto;
+  filter: drop-shadow(0 24px 40px rgba(63, 92, 55, 0.18));
+}
+
+/* 航线流动 */
+.hero__route {
+  stroke-dasharray: 8 8;
+  animation: routeflow 3.2s linear infinite;
+}
+@keyframes routeflow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+/* 无人机沿航线移动 */
+.hero__drone {
+  offset-path: path(
+    "M48 60 H272 V94 H48 V128 H272 V162 H48 V196 H272 V230 H48 V264"
+  );
+  animation: dronefly 9s ease-in-out infinite alternate;
+}
+@keyframes dronefly {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+.hero__scroll {
+  margin-top: 56px;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__route,
+  .hero__drone {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   背景特性卡片
+   ============================================================ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+}
+.feature-card {
+  padding: 26px 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+.feature-card__k {
+  font-size: 0.82rem;
+  color: var(--seed-gold-deep);
+  letter-spacing: 0.1em;
+}
+.feature-card__title {
+  font-size: 1.22rem;
+  margin: 10px 0 8px;
+}
+.feature-card__desc {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+}
+
+/* ============================================================
+   建模流程
+   ============================================================ */
+.flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+.flow__step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+}
+.flow__node {
+  flex: 1 1 auto;
+  min-width: 150px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.flow__node:hover {
+  border-color: var(--leaf);
+  transform: translateY(-3px);
+}
+.flow__idx {
+  font-size: 0.72rem;
+  color: var(--seed-gold-deep);
+  letter-spacing: 0.14em;
+}
+.flow__label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+.flow__note {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.flow__arrow {
+  color: var(--leaf);
+  font-size: 1.3rem;
+  flex: 0 0 auto;
+}
+
+/* 近似算法卡片 */
+.algo-block {
+  margin-top: 52px;
+}
+.algo-block__lead {
+  max-width: 640px;
+  margin-bottom: 26px;
+}
+.algo-block__intro {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+}
+.algo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+.algo-card {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--seed-gold);
+  border-radius: var(--r-md);
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease;
+}
+.algo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+  border-left-color: var(--leaf);
+}
+.algo-card__tag {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--seed-gold-deep);
+  background: rgba(217, 164, 65, 0.14);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.algo-card__name {
+  font-size: 1.24rem;
+  margin: 12px 0 2px;
+}
+.algo-card__en {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.algo-card__desc {
+  color: var(--ink-soft);
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   公式区
+   ============================================================ */
+.formula-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.formula-card {
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.formula-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+.formula-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+.formula-card__title {
+  font-size: 1.2rem;
+}
+.formula-card__math {
+  background: rgba(63, 92, 55, 0.06);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 16px 12px;
+  overflow-x: auto;
+  color: var(--leaf-deep);
+}
+.formula-card__math .katex {
+  font-size: 1.32em;
+  color: var(--ink);
+}
+.formula-card__fallback {
+  color: var(--soil-deep);
+  font-size: 1rem;
+}
+.formula-card__explain {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+.formula-card__map {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+.formula-card__map-tag {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--leaf);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+/* ============================================================
+   能力展示
+   ============================================================ */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+}
+.cap-card {
+  padding: 26px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cap-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+.cap-card__tag {
+  display: inline-block;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--leaf-deep);
+  background: rgba(90, 125, 79, 0.12);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.cap-card__title {
+  font-size: 1.2rem;
+  margin: 14px 0 8px;
+}
+.cap-card__desc {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+}
+
+/* ============================================================
+   底部 CTA
+   ============================================================ */
+.landing-footer {
+  padding: 96px 0 64px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(90, 125, 79, 0.06),
+    rgba(139, 111, 71, 0.1)
+  );
+  border-top: 1px solid var(--line);
+}
+.landing-footer__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.landing-footer__title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+.landing-footer__sub {
+  color: var(--ink-soft);
+  max-width: 52ch;
+  font-size: 1.05rem;
+}
+.landing-footer__meta {
+  margin-top: 26px;
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width: 880px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .hero__visual {
+    order: -1;
+  }
+  .hero__svg {
+    width: min(72%, 300px);
+  }
+  .formula-grid {
+    grid-template-columns: 1fr;
+  }
+  .formula-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+  .section {
+    padding: 64px 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .flow__step {
+    flex: 1 1 100%;
+  }
+  .flow__arrow {
+    transform: rotate(90deg);
+    margin: 0 auto;
+  }
+  .hero__cta {
+    width: 100%;
+  }
+}
