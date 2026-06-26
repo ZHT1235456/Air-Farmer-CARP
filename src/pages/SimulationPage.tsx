@@ -13,7 +13,6 @@ import DroneModel from "../three/DroneModel";
 import SeedingEffect from "../three/SeedingEffect";
 import SimDriver from "../three/SimDriver";
 import SimRouteOverlay from "../three/SimRouteOverlay";
-import FollowCamera from "../three/FollowCamera";
 import SimulationDashboard from "../components/simulation/SimulationDashboard";
 import SimulationControls from "../components/simulation/SimulationControls";
 import { MODE_LABELS } from "../components/planning/labels";
@@ -48,7 +47,6 @@ export default function SimulationPage() {
   const speedRef = useRef(1);
 
   const [speed, setSpeed] = useState(1);
-  const [follow, setFollow] = useState(false);
 
   // 引擎重建：复位倍速并推送初始快照
   useEffect(() => {
@@ -87,11 +85,10 @@ export default function SimulationPage() {
 
   return (
     <Workspace left={left} right={right}>
-      <WorldCanvas scenario={effectiveScenario} orbitEnabled={!follow} stripInteractive={false}>
+      <WorldCanvas scenario={effectiveScenario} stripInteractive={false}>
         <SimRouteOverlay plan={plan} />
         <DroneModel ref={droneRef} />
         <SeedingEffect emitterRef={emitterRef} activeRef={activeRef} />
-        <FollowCamera active={follow} droneRef={droneRef} />
         <SimDriver
           engine={engine}
           speedRef={speedRef}
@@ -103,7 +100,6 @@ export default function SimulationPage() {
 
       <SimulationControls
         speed={speed}
-        follow={follow}
         onToggle={() => engine.toggle()}
         onReset={() => {
           engine.reset();
@@ -111,7 +107,6 @@ export default function SimulationPage() {
         }}
         onSpeedDown={() => changeSpeed(-1)}
         onSpeedUp={() => changeSpeed(1)}
-        onToggleCamera={() => setFollow((f) => !f)}
         onBack={() => navigate("/planning")}
       />
     </Workspace>

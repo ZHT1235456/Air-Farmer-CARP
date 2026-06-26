@@ -4,12 +4,10 @@ import type { SimulationPlaybackState, SimulationStatus } from "../../types/doma
 
 interface Props {
   speed: number;
-  follow: boolean;
   onToggle: () => void;
   onSpeedDown: () => void;
   onSpeedUp: () => void;
   onReset: () => void;
-  onToggleCamera: () => void;
   onBack: () => void;
 }
 
@@ -35,12 +33,10 @@ function primaryLabel(state: SimulationPlaybackState): string {
 /** 地面站式图标控制台（规格 8.5–8.8） */
 export default function SimulationControls({
   speed,
-  follow,
   onToggle,
   onSpeedDown,
   onSpeedUp,
   onReset,
-  onToggleCamera,
   onBack,
 }: Props) {
   const snap = useSyncExternalStore(simStore.subscribe, simStore.get, simStore.get);
@@ -73,14 +69,6 @@ export default function SimulationControls({
       <span className="sim-sep" />
       <button className="sim-btn" title="重置" aria-label="重置" onClick={onReset}>
         ↻
-      </button>
-      <button
-        className={"sim-btn" + (follow ? " is-active" : "")}
-        title={follow ? "切换轨道视角" : "切换无人机跟踪视角"}
-        aria-label={follow ? "切换轨道视角" : "切换无人机跟踪视角"}
-        onClick={onToggleCamera}
-      >
-        {follow ? "🛰" : "🎥"}
       </button>
     </div>
   );

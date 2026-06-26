@@ -117,11 +117,6 @@
 .sim-btn:active {
   transform: scale(0.94);
 }
-.sim-btn.is-active {
-  border-color: var(--leaf);
-  background: rgba(90, 125, 79, 0.18);
-  color: var(--leaf-deep);
-}
 .sim-btn--primary {
   width: 48px;
   height: 48px;

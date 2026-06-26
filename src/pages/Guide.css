@@ -1,0 +1,322 @@
+/* ============================================================
+   操作说明页
+   ============================================================ */
+.guide {
+  width: 100%;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+}
+
+/* ---------- 头部 ---------- */
+.guide__hero {
+  padding: 72px 28px 28px;
+  max-width: 860px;
+}
+.guide__title {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  margin: 14px 0 18px;
+  background: linear-gradient(135deg, var(--leaf-deep), var(--soil));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.guide__lead {
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin-bottom: 30px;
+}
+.guide__cta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 通用 section ---------- */
+.guide__section {
+  padding: 56px 0;
+}
+.guide__section--tint {
+  background: linear-gradient(
+    180deg,
+    rgba(236, 231, 217, 0.5),
+    rgba(236, 231, 217, 0)
+  );
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.guide__head {
+  max-width: 720px;
+  margin-bottom: 34px;
+}
+.guide__h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin: 12px 0 12px;
+}
+.guide__sub {
+  color: var(--ink-soft);
+  font-size: 1.04rem;
+  max-width: 640px;
+}
+
+/* ---------- 使用流程 ---------- */
+.g-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+.g-flow__step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+}
+.g-flow__node {
+  flex: 1 1 auto;
+  min-width: 150px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.g-flow__node:hover {
+  border-color: var(--leaf);
+  transform: translateY(-3px);
+}
+.g-flow__idx {
+  font-size: 0.72rem;
+  color: var(--seed-gold-deep);
+  letter-spacing: 0.14em;
+}
+.g-flow__label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.12rem;
+}
+.g-flow__note {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+.g-flow__arrow {
+  color: var(--leaf);
+  font-size: 1.3rem;
+  flex: 0 0 auto;
+}
+
+/* ---------- 页面导览 ---------- */
+.g-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+.g-page-card {
+  padding: 24px 24px 22px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.g-page-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+.g-page-card:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+}
+.g-page-card__no {
+  font-size: 0.86rem;
+  color: var(--seed-gold-deep);
+  letter-spacing: 0.12em;
+}
+.g-page-card__name {
+  font-size: 1.24rem;
+  margin: 8px 0 10px;
+}
+.g-page-card__desc {
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.g-page-card__tip {
+  font-size: 0.8rem;
+  color: var(--leaf-deep);
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+}
+
+/* ---------- 控制台按键 ---------- */
+.g-key-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+.g-key {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.g-key:hover {
+  border-color: var(--leaf);
+  transform: translateY(-2px);
+}
+.g-key__icon {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, var(--seed-gold), var(--seed-gold-deep));
+  box-shadow: 0 4px 12px -5px rgba(189, 136, 38, 0.7);
+}
+.g-key__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.g-key__name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.g-key__desc {
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ---------- 算法说明 ---------- */
+.g-algo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+}
+.g-algo-card {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--seed-gold);
+  border-radius: var(--r-md);
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease;
+}
+.g-algo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+  border-left-color: var(--leaf);
+}
+.g-algo-card__tag {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--seed-gold-deep);
+  background: rgba(217, 164, 65, 0.14);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.g-algo-card__name {
+  font-size: 1.22rem;
+  margin: 12px 0 2px;
+}
+.g-algo-card__en {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.g-algo-card__desc {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin-bottom: 14px;
+  flex: 1 1 auto;
+}
+.g-algo-card__fit {
+  font-size: 0.85rem;
+  color: var(--ink);
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+}
+.g-algo-card__fit-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: var(--leaf);
+  padding: 2px 7px;
+  border-radius: 5px;
+  margin-right: 8px;
+}
+
+/* ---------- 评价指标 ---------- */
+.g-metric-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.g-metric {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.g-metric:hover {
+  border-color: var(--leaf);
+  transform: translateY(-2px);
+}
+.g-metric__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.08rem;
+  margin-bottom: 6px;
+  color: var(--leaf-deep);
+}
+.g-metric__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* ---------- 页脚 ---------- */
+.guide__foot {
+  text-align: center;
+  padding-top: 48px;
+}
+.guide__foot p {
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 560px) {
+  .g-flow__step {
+    flex: 1 1 100%;
+  }
+  .g-flow__arrow {
+    transform: rotate(90deg);
+    margin: 0 auto;
+  }
+  .guide__section {
+    padding: 40px 0;
+  }
+}
