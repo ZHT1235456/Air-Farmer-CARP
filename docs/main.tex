@@ -1,0 +1,709 @@
+\documentclass[UTF8,a4paper,12pt]{ctexart}
+
+\usepackage{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\geometry{left=2.6cm,right=2.6cm,top=2.8cm,bottom=2.8cm}
+\setlist[itemize]{leftmargin=2em}
+\setlist[enumerate]{leftmargin=2em}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    columns=fullflexible,
+    keepspaces=true
+}
+
+\title{\textbf{空中农夫：基于带容量约束弧路径问题的无人机播种航线规划仿真系统}}
+\author{朱华天}
+\date{2026年6月26日}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+随着智慧农业与低空无人机技术的发展，无人机播种逐渐成为农业自动化中的一个重要应用场景。播种任务的核心问题不仅是控制无人机沿固定路线飞行，更包括在有限电池容量、有限种箱容量、地块边界、障碍物和返航补给等约束下，规划一组可执行、成本较低且覆盖充分的播种航线。本文设计一个名为“空中农夫”的无人机播种航线规划仿真系统，并将其核心优化问题建模为带容量约束弧路径问题（Capacitated Arc Routing Problem, CARP）。在该模型中，播种航带被抽象为图中的必服务边，起降补给点被抽象为仓库节点，无人机的种箱容量和电池续航被转化为路径容量约束与航程预算约束。由于 CARP 是 NP-hard 问题，系统采用 Path Scanning 算法作为快速构造模式，以遗传算法作为标准优化模式，以 MemeticGA 作为高质量求解模式，并使用变邻域搜索（Variable Neighborhood Search, VNS）执行局部改进。最后，系统通过三维仿真模块展示无人机播种过程、航线执行顺序、返航补给行为和区域覆盖状态。本文重点讨论系统的问题建模、算法设计、软件架构和实验评价方案。
+\end{abstract}
+
+\noindent\textbf{关键词：}无人机播种；带容量约束弧路径问题；CARP；Path Scanning；遗传算法；MemeticGA；变邻域搜索；三维仿真；NP-hard
+
+\tableofcontents
+\newpage
+
+\section{引言}
+
+农业生产正在从传统机械化向智能化、自动化方向发展。无人机由于具有机动性强、部署成本相对较低、适应复杂地形能力强等特点，已被广泛应用于植保、测绘、喷洒和播种等任务。对于无人机播种场景而言，系统不仅需要生成能够覆盖目标农田的航线，还需要考虑无人机载种量、电池容量、返航补给、地块边界以及障碍物等实际约束。
+
+从产业背景看，农业无人机已经从试验性设备进入规模化应用阶段。《全国智慧农业行动计划（2024--2028年）》提出要推进智慧农业公共服务能力和重点领域应用拓展，为农业生产数字化、智能化提供政策环境\cite{moa2024smartagri}。植保无人机的应用规模也在快速增长，公开报道显示，2024年全国植保无人飞机保有量约为25.1万架，防治作业面积约为26.7亿亩次\cite{cau2024uav}。这说明无人机农业作业已经具备现实应用基础，下一步瓶颈不只是飞行平台本身，还包括面向真实地块的任务建模、航线优化和可解释仿真。
+
+从算法角度看，无人机播种不是一个简单的几何作图问题。若只考虑访问若干离散点，该问题可以近似为旅行商问题（Traveling Salesman Problem, TSP）。但是在真实播种任务中，无人机通常沿着一条条播种航带飞行，任务对象更接近“需要被服务的边”而非“需要被访问的点”。因此，本文选择将无人机播种航线规划建模为带容量约束弧路径问题（Capacitated Arc Routing Problem, CARP）。
+
+真实农田也并不总是理想的规则矩形区域。除田埂、沟渠、树木外，电线杆、通信杆线、斜拉线和架空电力线也是田间常见障碍物。相关报道指出，农田中的电线杆会占用耕地、限制线路下生产活动，并造成农机作业空间受限、效率下降和碰撞风险\cite{china2023pole}。农业无人机厂商的产品资料也将电线、树杆等列为农田常见障碍物，并强调雷达和视觉避障能力的重要性\cite{dji2018mg1p}。因此，本文将这些障碍物抽象为点状或线状禁飞区域，并进一步把被障碍物切断的播种航带转化为多条必服务边。
+
+本文设计的软件系统命名为“空中农夫”。系统目标是根据农田边界、播种幅宽和无人机参数自动生成播种航带，并在容量和续航约束下规划无人机的飞行路线。系统采用分层算法模式：Path Scanning 用于快速生成可行方案，遗传算法用于标准优化，MemeticGA 用于高质量求解，VNS 用于对已有路线进行局部改进。系统最终通过三维仿真方式展示航线规划结果，使用户能够直观理解无人机的播种过程。
+
+\section{问题背景与需求分析}
+
+\subsection{项目现实意义}
+
+精细化播种、变量施药和田间巡检等任务都要求系统能够理解农田空间结构，并把作业对象转化为可计算、可验证的任务模型。联合国粮农组织关于农业无人机的资料指出，无人机可用于作物健康监测、灌溉计划、施肥和农业数据采集等精细农业场景\cite{fao2024drones}。这些应用共同依赖高质量航线规划：如果航线不能覆盖目标区域，或频繁出现返航、绕行和安全缓冲冲突，无人机平台的效率优势会被削弱。
+
+对于播种任务而言，项目的现实意义主要体现在三个方面。第一，系统把农田作业从人工经验路线转化为可计算的航带服务问题，便于比较不同算法的作业成本。第二，系统显式考虑种箱容量、电池续航和返航补给，使仿真结果更接近真实无人机作业流程。第三，系统将电线杆、架空线等常见田间障碍纳入建模，能够解释真实农田为什么会被切分成多个服务片段，也能为后续三维仿真和安全避障预留接口。
+
+\subsection{无人机播种任务特点}
+
+无人机播种任务具有以下特点：
+
+\begin{enumerate}
+    \item \textbf{区域覆盖性}：播种任务要求无人机覆盖目标农田，而非仅访问若干孤立点。
+    \item \textbf{航带服务性}：在实际作业中，农田通常会根据播种幅宽划分为若干条平行航带，无人机沿航带飞行并完成播种。
+    \item \textbf{容量受限性}：无人机种箱容量有限，完成若干航带后需要返航补种。
+    \item \textbf{续航受限性}：无人机电池容量有限，每次飞行的航程或耗时不能超过安全预算。
+    \item \textbf{路径成本性}：航带之间存在空飞转移距离，合理排序可以减少总航程。
+    \item \textbf{障碍分割性}：电线杆、架空线、树木和沟渠等障碍物会打断原本连续的航带，使规则覆盖问题转化为带障碍的弧服务问题。
+    \item \textbf{可视化需求}：用户需要通过仿真界面理解航线执行过程，包括飞行路径、返航、覆盖区域和剩余资源。
+\end{enumerate}
+
+\subsection{系统功能需求}
+
+“空中农夫”系统需要支持如下功能：
+
+\begin{enumerate}
+    \item 输入农田边界、起降点、障碍物和无人机参数；
+    \item 根据播种幅宽生成待服务航带；
+    \item 将播种航线规划问题转化为图模型；
+    \item 在种箱容量和电池容量约束下生成可行路线；
+    \item 支持 Path Scanning、遗传算法、MemeticGA 和 VNS 等求解方式；
+    \item 对不同算法的覆盖率、总航程、返航次数和运行时间进行比较；
+    \item 提供三维仿真界面展示无人机执行播种任务的过程；
+    \item 输出规划结果，用于后续飞控系统或任务管理模块。
+\end{enumerate}
+
+\subsection{系统非功能需求}
+
+除基本功能外，系统还应满足以下非功能需求：
+
+\begin{itemize}
+    \item \textbf{实时性}：中小规模地块应在可接受时间内生成航线规划结果；
+    \item \textbf{可扩展性}：后续应能够扩展至多无人机协同、复杂地形和真实地图数据；
+    \item \textbf{可解释性}：系统应能展示算法选择理由、约束违反情况和评价指标；
+    \item \textbf{稳定性}：即使算法生成不可行个体，系统也应通过修复机制保证输出结果可用；
+    \item \textbf{可视化友好性}：仿真界面应清楚展示航线、航带、返航点和播种状态。
+\end{itemize}
+
+\section{基于 CARP 的无人机播种问题建模}
+
+\subsection{从农田到图模型}
+
+设农田区域经过预处理后被分解为若干条待播种航带。每条航带可以看作图中的一条必服务边。无人机从起降补给点出发，在完成若干航带后返回补给点进行补种或换电，然后继续执行下一趟任务。
+
+定义无向图：
+
+\[
+G=(V,E),
+\]
+
+其中 \(V\) 为航带端点、补给点和辅助路径节点集合，\(E\) 为可飞行边集合。设：
+
+\[
+R \subseteq E
+\]
+
+为必须服务的播种航带集合。对于每条必服务边 \(e_i \in R\)，定义：
+
+\begin{itemize}
+    \item \(c_i\)：服务该航带的飞行成本；
+    \item \(q_i\)：服务该航带所需种子量；
+    \item \(l_i\)：航带长度；
+    \item \(s_i\)：该航带覆盖的播种面积。
+\end{itemize}
+
+无人机补给点记为 \(v_0\)。单无人机可以执行多趟任务，每趟任务从 \(v_0\) 出发并返回 \(v_0\)。
+
+\subsection{障碍物与航带切分建模}
+
+田间障碍物可以分为点状障碍和线状障碍。电线杆、树干、塔基等可近似为点状障碍，其位置记为 \(o_p=(x_p,y_p)\)，并设置安全缓冲半径 \(\rho_p\)。架空电力线、通信线、斜拉线、沟渠边界等可近似为线状障碍，其几何对象记为 \(o_l\)，并设置安全缓冲距离 \(\rho_l\)。障碍物的缓冲区定义为：
+
+\[
+Z(o)=\{x\mid d(x,o)\leq \rho(o)\}.
+\]
+
+系统生成播种航带时，若某条原始航带 \(e_i\) 与障碍缓冲区 \(Z(o)\) 相交，则将其切分为若干条不与障碍缓冲区相交的子航带：
+
+\[
+e_i \rightarrow \{e_{i,1}, e_{i,2},\dots,e_{i,r}\}.
+\]
+
+切分后的每条子航带仍然是 CARP 中的必服务边，但无人机在子航带之间转移时需要经过可飞行空间。这样处理后，电线杆或架空线不会只表现为图上的一个静态障碍，而会直接改变必服务边集合 \(R\) 的结构，使模型能够反映真实农田被杆线分割后的作业特征。
+
+在当前 Python 验证系统中，障碍物以矩形禁飞区形式进入场景，航带与障碍物相交时被拆分为多个必服务边。后续系统可以进一步扩展为圆形缓冲区、折线缓冲区和真实 GIS 图层，从而更准确表达电线杆、拉线和架空电力线。
+
+\subsection{现实问题与 CARP 的对应关系}
+
+\begin{table}[H]
+\centering
+\caption{无人机播种问题与 CARP 模型的对应关系}
+\begin{tabular}{p{5cm}p{7cm}}
+\toprule
+无人机播种场景 & CARP 模型对象 \\
+\midrule
+起降点、补给点 & depot 节点 \(v_0\) \\
+播种航带 & required edge，必服务边 \\
+航带长度 & 边服务成本 \\
+航带所需种子量 & 边需求量 \(q_i\) \\
+无人机种箱容量 & 路径容量上限 \(Q\) \\
+无人机电池续航 & 单趟航程预算 \(B\) \\
+航带间空飞转移 & deadheading cost，非服务移动成本 \\
+电线杆、树干、塔基 & 点状障碍物及其安全缓冲区 \\
+架空线、斜拉线、沟渠 & 线状障碍物及其安全缓冲区 \\
+被障碍切断的航带 & 多条 required edges，仍需全部服务 \\
+多次返航补给 & 多条从 depot 出发并返回 depot 的路线 \\
+总航程或总作业时间 & 优化目标函数 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{优化目标}
+
+设系统最终生成 \(m\) 趟飞行路线：
+
+\[
+P_1,P_2,\dots,P_m.
+\]
+
+每条路线 \(P_k\) 都从补给点 \(v_0\) 出发并返回 \(v_0\)。令 \(C(P_k)\) 表示路线 \(P_k\) 的总代价，包括服务航带成本与航带间空飞转移成本。系统的基本优化目标为：
+
+\[
+\min \sum_{k=1}^{m} C(P_k).
+\]
+
+该目标表示最小化无人机完成全部播种任务的总飞行成本。根据实际需求，也可以将目标扩展为多目标优化，例如同时考虑总航程、作业时间、返航次数和覆盖率。
+
+\subsection{容量约束}
+
+设无人机种箱容量为 \(Q\)。每趟飞行中服务的航带总需求量不能超过 \(Q\)，即：
+
+\[
+\sum_{e_i \in P_k \cap R} q_i \leq Q,\quad k=1,2,\dots,m.
+\]
+
+该约束保证无人机在每趟飞行中携带的种子量足以完成当前路线中的所有播种航带。
+
+\subsection{电池或航程约束}
+
+设单趟最大可用航程或电池预算为 \(B\)，则每条路线还需要满足：
+
+\[
+C(P_k) \leq B,\quad k=1,2,\dots,m.
+\]
+
+若使用更细致的能耗模型，也可以将能耗写作：
+
+\[
+E(P_k)=E_{\text{fly}}(P_k)+E_{\text{seed}}(P_k)+E_{\text{turn}}(P_k),
+\]
+
+并要求：
+
+\[
+E(P_k) \leq B_E,
+\]
+
+其中 \(B_E\) 表示电池能量预算。
+
+\subsection{服务完整性约束}
+
+所有必服务航带都必须被至少一条路线服务：
+
+\[
+\bigcup_{k=1}^{m} (P_k \cap R) = R.
+\]
+
+如果要求每条航带只被服务一次，则有：
+
+\[
+(P_a \cap R) \cap (P_b \cap R) = \varnothing,\quad a\neq b.
+\]
+
+在实际播种中，少量重复覆盖可能允许存在，但会带来种子浪费。因此系统可以将重复服务作为惩罚项加入目标函数。
+
+\section{NP-hard 性与算法选择}
+
+\subsection{CARP 的计算复杂性}
+
+CARP 是经典的 NP-hard 组合优化问题。其困难性来自于两个方面：一方面，需要决定哪些必服务边被分配到同一趟路线中；另一方面，还需要决定每趟路线中各条航带的服务顺序。容量约束、电池约束和返航补给机制进一步增加了问题难度。
+
+在特殊情形下，如果所有边都必须被遍历且没有容量限制，问题可能退化为中国邮递员问题，该问题存在多项式时间算法。然而，在无人机播种场景中，系统只要求服务播种航带，并且受到种箱容量和续航约束限制，因此更符合 CARP 的困难形式。
+
+\subsection{精确算法与启发式算法的取舍}
+
+对于小规模实例，可以采用整数规划、分支定界或分支切割算法求解最优解。但对于实际软件系统而言，农田航带数量可能较多，并且系统需要在交互式环境中快速输出可行方案。因此，本文不以精确求解为主要目标，而采用启发式与元启发式算法在可接受时间内获得高质量解。
+
+本文采用如下算法策略：
+
+\begin{itemize}
+    \item \textbf{快速模式}：采用 Path Scanning 算法快速构造可行解，适用于交互式预览和实时反馈；
+    \item \textbf{标准模式}：采用遗传算法（Genetic Algorithm, GA）执行全局排列优化，作为系统默认求解方案；
+    \item \textbf{高质量模式}：采用 MemeticGA，将遗传算法与局部搜索结合，用于在可接受时间内获得更稳定的高质量解；
+    \item \textbf{局部改进}：采用变邻域搜索（Variable Neighborhood Search, VNS），对已有路线执行 swap、insertion、inversion、relocate 和 exchange 等邻域改进。
+\end{itemize}
+
+\section{航线规划算法设计}
+
+\subsection{整体求解流程}
+
+系统的求解流程如下：
+
+\begin{enumerate}
+    \item 输入农田边界、补给点和无人机参数；
+    \item 根据播种幅宽生成待服务航带；
+    \item 计算航带间转移距离；
+    \item 使用 Path Scanning、最近邻策略和随机策略生成候选顺序或初始种群；
+    \item 使用遗传算法迭代优化航带服务顺序；
+    \item 通过路线分割器插入返航点，保证容量和电池约束；
+    \item 对优秀解使用 VNS 进行局部改进，或在 MemeticGA 中嵌入局部搜索；
+    \item 输出航线规划结果并进入三维仿真模块。
+\end{enumerate}
+
+\subsection{快速模式：Path Scanning 算法}
+
+Path Scanning 是弧路径问题中常用的快速构造启发式算法，适合在交互式系统中快速生成可行路线。设当前未服务航带集合为 \(U\)，当前路线为 \(P_k\)，当前无人机剩余容量为 \(Q_r\)，剩余航程预算为 \(B_r\)。对于候选航带 \(e\in U\)，定义基础评分函数：
+
+\[
+\text{score}(e)=\frac{\Delta A(e)}{\Delta C(e)+\epsilon},
+\]
+
+其中 \(\Delta A(e)\) 表示加入航带 \(e\) 后新增覆盖面积，\(\Delta C(e)\) 表示插入该航带带来的额外飞行成本，\(\epsilon\) 是防止除零的小常数。与单一贪心策略不同，Path Scanning 会使用多条扫描规则生成候选解，例如优先选择增量距离最小的航带、优先选择远离补给点的航带、优先填满剩余容量的航带等。系统对这些候选解统一执行路线分割和约束检查，并选取综合成本最低的方案作为快速模式输出。
+
+\begin{algorithm}[H]
+\caption{Path Scanning 快速构造算法}
+\begin{algorithmic}[1]
+\State 输入：必服务航带集合 \(R\)，补给点 \(v_0\)，容量 \(Q\)，航程预算 \(B\)，扫描规则集合 \(\mathcal{S}\)
+\State 初始化候选解集合 \(\mathcal{X}\gets \varnothing\)
+\For{每条扫描规则 \(s\in \mathcal{S}\)}
+\State 初始化未服务集合 \(U \gets R\)，路线集合 \(\mathcal{P}\gets \varnothing\)
+\While{\(U\neq \varnothing\)}
+    \State 新建路线 \(P\gets [v_0]\)
+    \State 初始化剩余容量 \(Q_r\gets Q\)，剩余预算 \(B_r\gets B\)
+    \While{存在可行航带 \(e\in U\)}
+        \State 根据规则 \(s\) 选择评分最优且满足约束的航带 \(e^\ast\)
+        \State 将 \(e^\ast\) 插入当前路线 \(P\)
+        \State 更新 \(Q_r\)、\(B_r\) 和 \(U\)
+    \EndWhile
+    \State 将补给点 \(v_0\) 加入路线末尾
+    \State \(\mathcal{P}\gets \mathcal{P}\cup\{P\}\)
+\EndWhile
+\State \(\mathcal{X}\gets \mathcal{X}\cup\{\mathcal{P}\}\)
+\EndFor
+\State 输出综合成本最低的候选路线集合
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{标准模式：遗传算法}
+
+遗传算法是本文系统的主优化算法。由于无人机播种航线规划具有明显的排列优化特征，系统将每个个体编码为一个航带排列：
+
+\[
+X=[e_3,e_7,e_1,e_5,e_2,e_6,e_4].
+\]
+
+该排列表示无人机倾向于按照该顺序服务航带。随后，系统使用路线分割器根据容量和航程约束自动插入返航点，例如：
+
+\[
+[e_3,e_7,e_1]\mid[e_5,e_2]\mid[e_6,e_4].
+\]
+
+这样可以避免在染色体中直接编码复杂的返航位置，同时保证每个个体都能被转化为可执行路线。
+
+\subsubsection{初始种群}
+
+初始种群由以下几类个体组成：
+
+\begin{itemize}
+    \item 随机排列个体，用于保持多样性；
+    \item Path Scanning 生成的个体，用于提供较高质量初始解；
+    \item 最近邻策略生成的个体，用于降低空飞距离；
+    \item 扫描线顺序个体，用于模拟规则农田中的往返作业方式。
+\end{itemize}
+
+\subsubsection{适应度函数}
+
+系统以最小化综合成本为目标。定义个体 \(X\) 的成本函数为：
+
+\[
+F(X)=\alpha D(X)+\beta R(X)+\gamma V(X)+\eta U(X),
+\]
+
+其中：
+
+\begin{itemize}
+    \item \(D(X)\)：总飞行距离；
+    \item \(R(X)\)：返航次数；
+    \item \(V(X)\)：容量或航程约束违反惩罚；
+    \item \(U(X)\)：未服务航带数量；
+    \item \(\alpha,\beta,\gamma,\eta\)：权重参数。
+\end{itemize}
+
+若系统要求所有航带必须服务，则 \(U(X)\) 应当具有较大的惩罚权重。
+
+\subsubsection{交叉算子}
+
+由于染色体是航带排列，普通单点交叉可能导致航带重复或遗漏。因此系统采用顺序交叉（Order Crossover, OX）。OX 交叉先从一个父代中继承一段连续子序列，再按照另一个父代中的相对顺序填充剩余位置，从而保持排列合法性。
+
+\subsubsection{变异算子}
+
+系统采用三类变异操作：
+
+\begin{enumerate}
+    \item \textbf{swap}：随机交换两个航带位置；
+    \item \textbf{inversion}：随机选择一段子序列并反转；
+    \item \textbf{insertion}：随机取出一个航带并插入到另一位置。
+\end{enumerate}
+
+这些变异算子能够在保持解合法性的同时产生新的搜索方向。
+
+\subsubsection{修复机制}
+
+遗传算法生成的新个体可能存在约束问题。系统设置修复机制：
+
+\begin{enumerate}
+    \item 删除重复航带；
+    \item 补回遗漏航带；
+    \item 根据容量约束插入返航；
+    \item 根据电池约束拆分路线；
+    \item 对无法单独服务的航带给出参数错误提示。
+\end{enumerate}
+
+修复机制是系统可用性的关键。没有修复机制，遗传算法容易产生形式上有效但实际不可执行的解。
+
+\begin{algorithm}[H]
+\caption{遗传算法主流程}
+\begin{algorithmic}[1]
+\State 输入：航带集合 \(R\)，种群规模 \(N\)，最大迭代次数 \(T\)
+\State 构造初始种群 \(\mathcal{X}\)
+\For{\(t=1\) to \(T\)}
+    \State 对种群中每个个体进行路线分割与修复
+    \State 计算每个个体的适应度 \(F(X)\)
+    \State 使用锦标赛选择或轮盘赌选择父代
+    \State 使用 OX 交叉产生子代
+    \State 对子代执行 swap、inversion 或 insertion 变异
+    \State 对子代执行修复操作
+    \State 采用精英保留策略更新种群
+\EndFor
+\State 输出适应度最优的个体及其路线集合
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{局部改进：变邻域搜索}
+
+变邻域搜索（Variable Neighborhood Search, VNS）用于对已有可行解进行局部改进。其核心思想是围绕当前解定义多个邻域结构，并在不同邻域之间切换搜索方向，从而降低陷入单一局部最优的风险。对于无人机播种航线规划，VNS 不直接改变容量和航程约束，而是对航带服务顺序进行扰动，再通过路线分割器重新生成可行路线。
+
+系统采用的邻域操作包括：
+
+\begin{itemize}
+    \item \textbf{swap}：交换两条航带的服务顺序；
+    \item \textbf{insertion}：取出一条航带并插入到另一位置；
+    \item \textbf{inversion}：反转一段连续航带序列；
+    \item \textbf{route-relocate}：将一条航带从当前趟路线移动到另一趟路线附近；
+    \item \textbf{route-exchange}：交换两趟路线中的航带，减少不必要的空飞距离。
+\end{itemize}
+
+VNS 的输出仍然是航带排列。每次生成候选排列后，系统都会调用路线分割器检查容量约束和航程约束，只有综合成本更低且约束可行的解才会被接受。
+
+\begin{algorithm}[H]
+\caption{VNS 局部改进算法}
+\begin{algorithmic}[1]
+\State 输入：初始航带排列 \(X\)，邻域集合 \(\mathcal{N}\)，最大迭代次数 \(T\)
+\State \(X^\ast \gets X\)
+\For{\(t=1\) to \(T\)}
+    \For{每个邻域 \(N_i\in\mathcal{N}\)}
+        \State 根据 \(N_i\) 生成候选排列 \(X'\)
+        \State 对 \(X'\) 执行路线分割与约束检查
+        \If{\(F(X')<F(X^\ast)\) 且 \(X'\) 可行}
+            \State \(X^\ast \gets X'\)
+            \State 跳回第一个邻域继续搜索
+        \EndIf
+    \EndFor
+\EndFor
+\State 输出局部改进后的排列 \(X^\ast\)
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{高质量模式：MemeticGA}
+
+MemeticGA 是遗传算法与局部搜索结合的混合元启发式算法。普通遗传算法擅长在全局范围内搜索不同航带排列，但其子代个体可能仍存在局部排列不够紧凑的问题。MemeticGA 在遗传算法的选择、交叉、变异流程基础上，对精英个体或优秀子代执行轻量级 VNS，使个体在进入下一代前完成局部细化。
+
+在本系统中，MemeticGA 的初始种群不仅包含随机排列，还包含 Path Scanning、最近邻策略和扫描线策略生成的高质量种子。算法迭代过程中，系统对部分精英个体执行局部搜索，并保留综合成本最低的可行个体。该模式运行时间高于标准遗传算法，但在中小规模 benchmark 中表现更稳定，适合作为“高质量模式”供用户在时间允许时选择。
+
+\begin{algorithm}[H]
+\caption{MemeticGA 高质量求解算法}
+\begin{algorithmic}[1]
+\State 输入：航带集合 \(R\)，种群规模 \(N\)，最大迭代次数 \(T\)
+\State 使用 Path Scanning、最近邻、扫描线和随机排列构造初始种群
+\For{\(t=1\) to \(T\)}
+    \State 对种群进行路线分割、修复和适应度评价
+    \State 使用选择、OX 交叉和变异生成子代
+    \State 对精英个体或优秀子代执行轻量 VNS
+    \State 采用精英保留策略更新种群
+\EndFor
+\State 输出综合成本最低的可行路线集合
+\end{algorithmic}
+\end{algorithm}
+
+\section{系统总体设计}
+
+\subsection{系统架构}
+
+“空中农夫”系统由数据输入层、建模层、算法层、仿真层和结果输出层组成。总体结构如下：
+
+\begin{enumerate}
+    \item \textbf{数据输入层}：负责读取农田边界、障碍物、补给点和无人机参数；
+    \item \textbf{航带生成层}：根据播种幅宽和农田边界生成待播种航带；
+    \item \textbf{CARP 建模层}：将航带转化为图中的必服务边，并计算边成本和需求量；
+    \item \textbf{算法优化层}：运行 Path Scanning、遗传算法、MemeticGA 和 VNS；
+    \item \textbf{约束检查层}：检查容量、电池、边界和障碍物约束；
+    \item \textbf{三维仿真层}：展示无人机飞行、播种、返航和补给过程；
+    \item \textbf{结果输出层}：输出航线文件、评价指标和仿真报告。
+\end{enumerate}
+
+\subsection{模块划分}
+
+\begin{table}[H]
+\centering
+\caption{系统模块设计}
+\begin{tabular}{p{4cm}p{8cm}}
+\toprule
+模块名称 & 主要功能 \\
+\midrule
+地块输入模块 & 输入或绘制农田边界、障碍物和补给点 \\
+航带生成模块 & 根据播种幅宽自动生成平行航带 \\
+图模型构建模块 & 构造 CARP 图模型，计算服务成本与转移成本 \\
+参数配置模块 & 设置无人机速度、种箱容量、电池容量、播种密度等参数 \\
+航线优化模块 & 使用 Path Scanning、遗传算法、MemeticGA 和 VNS 生成路线 \\
+约束检查模块 & 检查容量超限、航程超限、障碍物穿越和未覆盖航带 \\
+算法对比模块 & 统计不同算法的总航程、返航次数、运行时间和覆盖率 \\
+三维仿真模块 & 展示无人机播种过程和航线执行动画 \\
+结果导出模块 & 导出航线规划结果、实验数据和可视化截图 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{核心数据结构}
+
+系统内部可以使用如下数据结构描述航带：
+
+\begin{lstlisting}[language=Python, caption={航带数据结构示例}]
+class Strip:
+    def __init__(self, strip_id, start, end, length, demand, cost):
+        self.strip_id = strip_id
+        self.start = start
+        self.end = end
+        self.length = length
+        self.demand = demand
+        self.cost = cost
+        self.covered_area = None
+\end{lstlisting}
+
+路线可以表示为航带序列：
+
+\begin{lstlisting}[language=Python, caption={路线数据结构示例}]
+class Route:
+    def __init__(self):
+        self.strips = []
+        self.total_distance = 0.0
+        self.total_demand = 0.0
+        self.energy_cost = 0.0
+\end{lstlisting}
+
+\section{三维仿真与可视化设计}
+
+\subsection{仿真目标}
+
+三维仿真模块的目标不是替代真实飞控系统，而是帮助用户理解算法规划结果。通过三维场景，用户可以观察无人机如何从补给点起飞，按规划航线完成播种，并在容量或电池不足时返航补给。
+
+\subsection{场景元素}
+
+三维场景应包含以下元素：
+
+\begin{itemize}
+    \item 农田地块边界；
+    \item 播种航带；
+    \item 起降点与补给点；
+    \item 障碍物或禁飞区，包括电线杆、架空线、树木和沟渠等；
+    \item 无人机模型；
+    \item 已播种区域与未播种区域；
+    \item 电池状态和种箱状态；
+    \item 当前航线编号和任务进度。
+\end{itemize}
+
+\subsection{动画流程}
+
+仿真动画可以按照以下流程执行：
+
+\begin{enumerate}
+    \item 系统加载农田和航线规划结果；
+    \item 无人机从补给点起飞；
+    \item 无人机沿第一趟路线飞行并播种；
+    \item 已播种航带颜色发生变化；
+    \item 当路线完成后，无人机返回补给点；
+    \item 系统更新电池和种箱状态；
+    \item 无人机继续执行下一趟路线；
+    \item 所有航带完成后，系统显示总航程、返航次数和覆盖率。
+\end{enumerate}
+
+\subsection{算法对比可视化}
+
+为支持算法比较，系统可以在三维界面中提供不同算法结果切换功能。例如，用户可以选择“快速模式 Path Scanning”“标准模式 GA”“高质量模式 MemeticGA”或“局部改进 VNS”，系统显示对应航线。对比内容包括：
+
+\begin{itemize}
+    \item 航线总长度；
+    \item 返航次数；
+    \item 航带服务顺序；
+    \item 未覆盖区域；
+    \item 算法运行时间。
+\end{itemize}
+
+\section{实验设计与评价指标}
+
+\subsection{实验设置}
+
+实验可设置三类地块：
+
+\begin{enumerate}
+    \item 规则矩形地块；
+    \item 含电线杆、架空线或矩形禁飞区的障碍物地块；
+    \item 不规则多边形地块。
+\end{enumerate}
+
+对于每类地块，设置不同规模的航带数量，例如 \(25\) 和 \(50\) 条左右的中小规模航带。无人机参数包括种箱容量、最大航程、飞行速度和播种密度。每组实验分别运行 Path Scanning、遗传算法、VNS 和 MemeticGA。
+
+\subsection{评价指标}
+
+主要评价指标包括：
+
+\begin{enumerate}
+    \item \textbf{总飞行距离}：
+    \[
+    D=\sum_{k=1}^{m} C(P_k).
+    \]
+    \item \textbf{返航次数}：
+    \[
+    R=m-1.
+    \]
+    \item \textbf{覆盖率}：
+    \[
+    \text{Coverage Rate}=\frac{\text{已服务航带数量}}{\text{总航带数量}}.
+    \]
+    \item \textbf{运行时间}：算法从开始求解到输出结果所用时间。
+    \item \textbf{约束违反次数}：统计容量、电池或障碍物约束被违反的次数。
+    \item \textbf{综合成本函数}：
+    \[
+    F=\alpha D+\beta R+\gamma T+\delta V,
+    \]
+    其中 \(D\) 为总距离，\(R\) 为返航次数，\(T\) 为运行时间，\(V\) 为约束违反惩罚。
+\end{enumerate}
+
+\subsection{预期结果分析}
+
+预期 Path Scanning 运行速度最快，能够快速输出可行航线，但由于其本质上仍是构造启发式算法，总航程可能长于全局优化方法。遗传算法在运行时间上高于 Path Scanning，但能够通过全局搜索获得更短的总航线和更合理的返航分割。VNS 适合对已有解进行局部改进，尤其适合减少不必要的空飞距离。MemeticGA 将遗传算法和 VNS 结合，运行时间高于标准模式，但在中小规模实验中通常具有更稳定的解质量。
+
+因此，系统的推荐方案是：快速模式使用 Path Scanning，标准模式使用遗传算法，高质量模式使用 MemeticGA，并将 VNS 作为局部改进模块。
+
+\section{总结与展望}
+
+本文设计了“空中农夫”无人机播种航线规划仿真系统。该系统面向单无人机播种场景，将农田播种航带建模为带容量约束弧路径问题中的必服务边，将无人机种箱容量和电池续航转化为路线容量约束和航程预算约束。由于 CARP 是 NP-hard 问题，系统不追求大规模实例的精确最优解，而采用 Path Scanning、遗传算法、MemeticGA 和 VNS 等方法，在可接受时间内生成高质量可行航线。
+
+在算法设计上，Path Scanning 被设置为快速模式，遗传算法被设置为标准模式，MemeticGA 被设置为高质量模式，VNS 被设置为局部改进模块。系统通过三维仿真模块展示无人机飞行、播种、返航和补给过程，使算法结果更直观。
+
+未来系统可以从以下方向继续扩展：
+
+\begin{enumerate}
+    \item 从单无人机扩展到多无人机协同播种；
+    \item 引入真实地理信息系统数据；
+    \item 使用电线杆、架空线和沟渠等真实田间障碍图层生成安全缓冲区；
+    \item 建立更精细的电池能耗模型；
+    \item 考虑风速、坡度和地形对飞行成本的影响；
+    \item 接入真实无人机飞控任务文件格式；
+    \item 引入在线重规划机制，应对突发障碍或电池异常。
+\end{enumerate}
+
+\begin{thebibliography}{99}
+
+\bibitem{moa2024smartagri}
+农业农村部等.
+全国智慧农业行动计划（2024--2028年）.
+\url{https://policy.mofcom.gov.cn/claw/policyInfo.shtml?id=6750}.
+
+\bibitem{cau2024uav}
+中国农业大学新闻网.
+我国植保无人飞机规模化应用相关报道.
+\url{https://news.cau.edu.cn/mtndnew/d26d46e9fcf946ad9174171b9bad178a.htm}.
+
+\bibitem{fao2024drones}
+Food and Agriculture Organization of the United Nations.
+Agricultural drones and digital agriculture materials.
+\url{https://openknowledge.fao.org/server/api/core/bitstreams/5d85a726-91df-47f2-b986-9970261a1ed4/content}.
+
+\bibitem{china2023pole}
+中国网观点中国.
+让农田里的电线杆少些再少些.
+\url{https://www.china.com.cn/opinion2020/2023-07/27/content_95510690.shtml}.
+
+\bibitem{dji2018mg1p}
+DJI 大疆农业.
+MG-1P 农业植保机产品资料.
+\url{https://www.dji.com/cn/mg-1p}.
+
+\bibitem{golden1981}
+Golden, B. L., \& Wong, R. T. (1981).
+Capacitated arc routing problems.
+\textit{Networks}, 11(3), 305--315.
+
+\bibitem{ulusoy1985}
+Ulusoy, G. (1985).
+The fleet size and mix problem for capacitated arc routing.
+\textit{European Journal of Operational Research}, 22(3), 329--337.
+
+\bibitem{holland1975}
+Holland, J. H. (1975).
+\textit{Adaptation in Natural and Artificial Systems}.
+University of Michigan Press.
+
+\bibitem{mladenovic1997}
+Mladenovi{\'c}, N., \& Hansen, P. (1997).
+Variable neighborhood search.
+\textit{Computers \& Operations Research}, 24(11), 1097--1100.
+
+\bibitem{moscato1989}
+Moscato, P. (1989).
+On evolution, search, optimization, genetic algorithms and martial arts: Towards memetic algorithms.
+Caltech Concurrent Computation Program Report 826.
+
+\bibitem{garey1979}
+Garey, M. R., \& Johnson, D. S. (1979).
+\textit{Computers and Intractability: A Guide to the Theory of NP-Completeness}.
+W. H. Freeman.
+
+\end{thebibliography}
+
+\end{document}
