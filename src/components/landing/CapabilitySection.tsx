@@ -1,15 +1,18 @@
+import { Icon, type IconName } from "../common/icons";
+
 interface Capability {
   k: string;
+  icon: IconName;
   title: string;
   desc: string;
 }
 
 const CAPS: Capability[] = [
-  { k: "场景", title: "农田场景预览", desc: "多种内置农田与障碍物，俯视查看航带划分与统计信息。" },
-  { k: "航带", title: "航带自动生成", desc: "按播种幅宽生成平行航带，障碍物处切分为子航带。" },
-  { k: "规划", title: "航线规划求解", desc: "Path Scanning / GA / MemeticGA / VNS 多算法生成航线。" },
-  { k: "仿真", title: "三维播种仿真", desc: "Three.js 展示飞行、播种、返航补给的完整动画流程。" },
-  { k: "对比", title: "算法指标对比", desc: "总航程、返航次数、覆盖率、运行时间多维度对比。" },
+  { k: "场景", icon: "scene", title: "农田场景预览", desc: "多种内置农田与障碍物，俯视查看航带划分与统计信息。" },
+  { k: "航带", icon: "strips", title: "航带自动生成", desc: "按播种幅宽生成平行航带，障碍物处切分为子航带。" },
+  { k: "规划", icon: "planning", title: "航线规划求解", desc: "Path Scanning / GA / MemeticGA / VNS 多算法生成航线。" },
+  { k: "仿真", icon: "simulate", title: "三维播种仿真", desc: "Three.js 展示飞行、播种、返航补给的完整动画流程。" },
+  { k: "对比", icon: "compare", title: "算法指标对比", desc: "总航程、返航次数、覆盖率、运行时间多维度对比。" },
 ];
 
 export default function CapabilitySection() {
@@ -31,7 +34,12 @@ export default function CapabilitySection() {
               className="cap-card card reveal"
               style={{ animationDelay: `${0.05 + i * 0.06}s` }}
             >
-              <span className="cap-card__tag mono">{c.k}</span>
+              <div className="cap-card__top">
+                <span className="cap-card__icon">
+                  <Icon name={c.icon} size={18} />
+                </span>
+                <span className="cap-card__tag mono">{c.k}</span>
+              </div>
               <h3 className="cap-card__title">{c.title}</h3>
               <p className="cap-card__desc">{c.desc}</p>
             </article>

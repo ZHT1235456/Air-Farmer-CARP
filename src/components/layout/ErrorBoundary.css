@@ -1,0 +1,57 @@
+.eb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  min-height: min(70vh, 560px);
+}
+
+.eb__card {
+  max-width: 540px;
+  width: 100%;
+  padding: 40px 38px 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  border-left: 3px solid var(--danger);
+}
+
+.eb__mark {
+  margin-bottom: 6px;
+  filter: drop-shadow(0 6px 12px var(--danger-soft));
+}
+
+.eb__title {
+  font-size: 1.7rem;
+  margin: 4px 0 2px;
+}
+
+.eb__hint {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 44ch;
+}
+
+.eb__msg {
+  width: 100%;
+  margin: 6px 0 4px;
+  padding: 12px 14px;
+  max-height: 120px;
+  overflow: auto;
+  font-size: 0.78rem;
+  color: var(--soil-deep);
+  background: rgba(199, 93, 74, 0.08);
+  border: 1px solid var(--danger-soft);
+  border-radius: var(--r-sm);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.eb__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}

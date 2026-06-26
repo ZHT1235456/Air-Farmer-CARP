@@ -42,40 +42,83 @@ export default function AlgorithmCompareTable({ output }: { output: PlanOutput }
     if (better) bestIdx = i;
   });
 
+  const exportCsv = () => {
+    const headers = [
+      "算法",
+      "总航程(m)",
+      "返航",
+      "覆盖率(%)",
+      "耗时(ms)",
+      "违反",
+      "综合成本",
+    ];
+    const lines = [headers.join(",")];
+    output.results.forEach((r, i) => {
+      lines.push(
+        [
+          MODE_SHORT[r.algorithm],
+          r.totalDistance.toFixed(1),
+          r.returnCount,
+          (r.coverageRate * 100).toFixed(1),
+          r.runtimeMs.toFixed(0),
+          r.violations.length,
+          composites[i].toFixed(precision),
+        ].join(",")
+      );
+    });
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "algorithm-compare.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="compare-wrap">
-    <table className="compare-table">
-      <thead>
-        <tr>
-          <th>算法</th>
-          <th>总航程</th>
-          <th>返航</th>
-          <th>覆盖率</th>
-          <th>耗时(ms)</th>
-          <th>违反</th>
-          <th>综合成本</th>
-        </tr>
-      </thead>
-      <tbody>
-        {output.results.map((r, i) => (
-          <tr
-            key={i}
-            className={
-              (i === selectedIndex ? "is-selected " : "") + (i === bestIdx ? "is-best" : "")
-            }
-            onClick={() => selectResult(i)}
-          >
-            <td>{MODE_SHORT[r.algorithm]}</td>
-            <td className="mono">{fmt(r.totalDistance)}</td>
-            <td className="mono">{r.returnCount}</td>
-            <td className="mono">{fmt(r.coverageRate * 100)}%</td>
-            <td className="mono">{fmt(r.runtimeMs)}</td>
-            <td className="mono">{r.violations.length}</td>
-            <td className="mono">{composites[i].toFixed(precision)}</td>
+      <div className="compare-bar">
+        <span className="compare-hint mono">
+          最优行以金色描边标注 · 点击行查看详情
+        </span>
+        <button type="button" className="btn-ghost compare-export" onClick={exportCsv}>
+          导出 CSV
+        </button>
+      </div>
+      <table className="compare-table">
+        <thead>
+          <tr>
+            <th>算法</th>
+            <th>总航程 m</th>
+            <th>返航</th>
+            <th>覆盖率</th>
+            <th>耗时 ms</th>
+            <th>违反</th>
+            <th>综合成本</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {output.results.map((r, i) => (
+            <tr
+              key={i}
+              className={
+                (i === selectedIndex ? "is-selected " : "") + (i === bestIdx ? "is-best" : "")
+              }
+              onClick={() => selectResult(i)}
+            >
+              <td className="compare-algo">{MODE_SHORT[r.algorithm]}</td>
+              <td className="mono">{fmt(r.totalDistance)}</td>
+              <td className="mono">{r.returnCount}</td>
+              <td className="mono">{fmt(r.coverageRate * 100)}%</td>
+              <td className="mono">{fmt(r.runtimeMs)}</td>
+              <td className="mono">{r.violations.length}</td>
+              <td className="mono compare-cost">{composites[i].toFixed(precision)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

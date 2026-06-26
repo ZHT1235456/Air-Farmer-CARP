@@ -1,0 +1,145 @@
+.ps {
+  width: 100%;
+}
+
+.ps__bar {
+  height: var(--topbar-h);
+  background: rgba(245, 243, 236, 0.82);
+  border-bottom: 1px solid var(--line);
+}
+
+.ps__ws {
+  display: grid;
+  grid-template-columns: var(--side-l, 308px) 1fr var(--side-r, 300px);
+  height: calc(100vh - var(--topbar-h));
+  background-color: var(--paper-2);
+  background-image: linear-gradient(180deg, var(--paper-2), var(--paper-3));
+}
+
+.ps__side {
+  height: 100%;
+  overflow: hidden;
+  padding: 22px 20px 24px;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.ps__side--l {
+  border-right: 1px solid var(--line);
+}
+.ps__side--r {
+  border-left: 1px solid var(--line);
+}
+
+.ps__head {
+  height: 30px;
+  width: 60%;
+  border-radius: var(--r-sm);
+  background: var(--skel, rgba(42, 38, 32, 0.08));
+}
+
+.ps__group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ps__eyebrow {
+  height: 10px;
+  width: 38%;
+  border-radius: 999px;
+  background: rgba(90, 125, 79, 0.18);
+}
+
+.ps__card {
+  height: 56px;
+  border-radius: var(--r-md);
+  background: var(--skel, rgba(42, 38, 32, 0.07));
+}
+.ps__card--sm {
+  height: 28px;
+  width: 70%;
+}
+
+.ps__stage {
+  position: relative;
+  padding: 14px;
+  min-width: 0;
+}
+
+.ps__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: radial-gradient(
+      120% 90% at 30% 10%,
+      rgba(217, 164, 65, 0.18),
+      transparent 60%
+    ),
+    linear-gradient(160deg, #d7e0d6, #cdd6cf 60%, #c2cdc6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  display: grid;
+  place-items: center;
+}
+
+.ps__viewport-tag {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+
+/* 骨架 shimmer */
+.ps__head,
+.ps__card,
+.ps__eyebrow {
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    rgba(42, 38, 32, 0.05) 25%,
+    rgba(42, 38, 32, 0.12) 47%,
+    rgba(42, 38, 32, 0.05) 70%
+  );
+  background-color: rgba(42, 38, 32, 0.05);
+  animation: ps-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes ps-shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps__head,
+  .ps__card,
+  .ps__eyebrow {
+    animation: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .ps__ws {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    height: auto;
+  }
+  .ps__side {
+    height: auto;
+    max-height: none;
+  }
+  .ps__stage {
+    height: 56vh;
+  }
+}

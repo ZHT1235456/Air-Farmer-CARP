@@ -11,6 +11,7 @@ import GroundPlane from "./GroundPlane";
 import FieldGround from "./FieldGround";
 import Bund from "./Bund";
 import EnvDressing from "./EnvDressing";
+import GrassWave from "./GrassWave";
 
 /**
  * 可复用写实农田世界（不含 Canvas）。
@@ -50,6 +51,7 @@ export default function RealisticWorld({
       <ObstacleRenderer obstacles={scenario.obstacles} />
       <DepotMarker depot={scenario.depot} />
       <EnvDressing bounds={bounds} depot={scenario.depot} />
+      <GrassWave bounds={bounds} />
 
       {children}
     </>

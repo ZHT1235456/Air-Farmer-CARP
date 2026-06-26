@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
+import { lazy, type ReactNode } from "react";
 import LandingPage from "../pages/LandingPage";
-import ScenePreviewPage from "../pages/ScenePreviewPage";
-import RoutePlanningPage from "../pages/RoutePlanningPage";
-import SimulationPage from "../pages/SimulationPage";
-import GuidePage from "../pages/GuidePage";
+
+const ScenePreviewPage = lazy(() => import("../pages/ScenePreviewPage"));
+const RoutePlanningPage = lazy(() => import("../pages/RoutePlanningPage"));
+const SimulationPage = lazy(() => import("../pages/SimulationPage"));
+const GuidePage = lazy(() => import("../pages/GuidePage"));
 
 export interface NavItem {
   path: string;

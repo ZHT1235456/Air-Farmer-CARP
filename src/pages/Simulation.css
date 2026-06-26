@@ -5,22 +5,41 @@
   gap: 16px;
 }
 .dash__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
   font-weight: 600;
   font-size: 1.05rem;
   padding: 10px;
   border-radius: 10px;
   letter-spacing: 0.05em;
-  background: rgba(90, 125, 79, 0.12);
+  background: var(--success-soft);
   color: var(--leaf-deep);
+}
+.dash__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+  animation: dash-blink 1.6s ease-in-out infinite;
+}
+@keyframes dash-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash__status-dot { animation: none; }
 }
 .dash__status--seeding {
   background: rgba(90, 125, 79, 0.2);
   color: var(--leaf-deep);
 }
 .dash__status--returning {
-  background: rgba(59, 130, 246, 0.16);
-  color: #2c5fb8;
+  background: var(--info-bg);
+  color: var(--info);
 }
 .dash__status--refilling {
   background: rgba(217, 164, 65, 0.2);
@@ -56,7 +75,22 @@
 .gauge__fill {
   height: 100%;
   border-radius: 999px;
-  transition: width 0.15s linear;
+  transition: width 0.15s linear, background 0.3s var(--ease-soft);
+}
+.gauge--low .gauge__head {
+  color: var(--danger);
+}
+.gauge--low .gauge__track {
+  background: rgba(199, 93, 74, 0.18);
+  animation: gauge-pulse 1.4s ease-in-out infinite;
+}
+.gauge--low .gauge__pct {
+  color: var(--danger-deep);
+  font-weight: 700;
+}
+@keyframes gauge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(199, 93, 74, 0); }
+  50% { box-shadow: 0 0 0 3px rgba(199, 93, 74, 0.18); }
 }
 
 .dash__metrics {

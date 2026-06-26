@@ -45,12 +45,13 @@ export default function SimulationDashboard({ drone, algorithmLabel }: Props) {
   return (
     <div className="dash">
       <div className={"dash__status dash__status--" + s.status}>
+        <span className="dash__status-dot" />
         {STATUS_CN[s.status]}
       </div>
 
       {/* 电池 / 种箱 条 */}
-      <Gauge label="电池" pct={s.batteryPct} color="#5a7d4f" />
-      <Gauge label="种箱" pct={s.seedPct} color="#d9a441" />
+      <Gauge label="电池" pct={s.batteryPct} kind="battery" />
+      <Gauge label="种箱" pct={s.seedPct} kind="seed" />
 
       <dl className="dash__metrics">
         <Row k="当前算法" v={algorithmLabel} />
@@ -67,15 +68,35 @@ export default function SimulationDashboard({ drone, algorithmLabel }: Props) {
   );
 }
 
-function Gauge({ label, pct, color }: { label: string; pct: number; color: string }) {
+function Gauge({
+  label,
+  pct,
+  kind,
+}: {
+  label: string;
+  pct: number;
+  kind: "battery" | "seed";
+}) {
+  const p = Math.max(0, Math.min(1, pct));
+  const low = p < 0.2;
+
+  const from = kind === "battery" ? "var(--leaf)" : "var(--seed-gold)";
+  const to = kind === "battery" ? "var(--leaf-soft)" : "var(--seed-gold-deep)";
+  const fill = low
+    ? "linear-gradient(90deg, var(--danger-deep), var(--danger))"
+    : `linear-gradient(90deg, ${from}, ${to})`;
+
   return (
-    <div className="gauge">
+    <div className={"gauge" + (low ? " gauge--low" : "")}>
       <div className="gauge__head">
         <span>{label}</span>
-        <span className="mono">{Math.round(pct * 100)}%</span>
+        <span className="mono gauge__pct">{Math.round(p * 100)}%</span>
       </div>
       <div className="gauge__track">
-        <div className="gauge__fill" style={{ width: `${pct * 100}%`, background: color }} />
+        <div
+          className="gauge__fill"
+          style={{ width: `${p * 100}%`, background: fill }}
+        />
       </div>
     </div>
   );

@@ -59,15 +59,42 @@ export default function PlanResultPanel() {
       </dl>
 
       <div className={"result-feasible " + (result.feasible ? "ok" : "bad")}>
-        {result.feasible ? "✓ 可行解" : "✗ 存在不可行"}
+        {result.feasible ? (
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path
+              d="M4 10.5 L8 14.2 L16.2 6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path
+              d="M6 6 L14 14 M14 6 L6 14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
+        {result.feasible ? "可行解" : "存在不可行"}
       </div>
 
       {result.violations.length > 0 && (
         <ul className="result-violations">
           {result.violations.slice(0, 4).map((v, i) => (
-            <li key={i}>{v.message}</li>
+            <li key={i}>
+              <span className="result-violation__dot" aria-hidden="true" />
+              {v.message}
+            </li>
           ))}
-          {result.violations.length > 4 && <li>…等 {result.violations.length} 项</li>}
+          {result.violations.length > 4 && (
+            <li className="result-violation__more">…等 {result.violations.length} 项</li>
+          )}
         </ul>
       )}
 

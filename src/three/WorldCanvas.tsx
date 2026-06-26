@@ -1,7 +1,13 @@
 import { useMemo, type ReactNode } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import {
+  OrbitControls,
+  PerspectiveCamera,
+  Environment,
+  Lightformer,
+} from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import type { Scenario } from "../types/domain";
 import { computeSceneBounds, computeCameraPose } from "./coords";
 import RealisticWorld from "./world/RealisticWorld";
@@ -41,7 +47,7 @@ export default function WorldCanvas({
         antialias: true,
         powerPreference: "high-performance",
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 0.62,
+        toneMappingExposure: 1.05,
       }}
       onPointerMissed={onPointerMissed}
     >
@@ -65,6 +71,41 @@ export default function WorldCanvas({
       <RealisticWorld scenario={scenario} seededIds={seededIds} stripInteractive={stripInteractive}>
         {children}
       </RealisticWorld>
+
+      {/* 程序化柔光环境（离线、无 HDR）：为金属/漆面提供反射 */}
+      <Environment resolution={64} frames={1} background={false}>
+        <Lightformer
+          intensity={2.4}
+          color="#fff1d6"
+          position={[0, 8, 0]}
+          scale={[size * 1.5, size * 1.5, 1]}
+        />
+        <Lightformer
+          intensity={1.6}
+          color="#bcd6ff"
+          position={[-size, 4, -size]}
+          scale={[size, size, 1]}
+          rotation={[0, Math.PI / 4, 0]}
+        />
+        <Lightformer
+          intensity={1.2}
+          color="#d9a441"
+          position={[size, 3, size]}
+          scale={[size, size, 1]}
+          rotation={[0, -Math.PI / 4, 0]}
+        />
+      </Environment>
+
+      {/* 轻量后处理：让金色与高光微微泛光 */}
+      <EffectComposer>
+        <Bloom
+          mipmapBlur
+          intensity={0.22}
+          luminanceThreshold={0.78}
+          luminanceSmoothing={0.3}
+          radius={0.7}
+        />
+      </EffectComposer>
     </Canvas>
   );
 }

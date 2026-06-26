@@ -3,7 +3,7 @@ import { useAppStore, useCurrentScenario } from "../store/appStore";
 import { rebuildScenario } from "../scenarios/scenarioFactory";
 import { usePlanner } from "../hooks/usePlanner";
 import Workspace, { SidebarSection, SidebarHeader } from "../components/layout/Workspace";
-import ScenarioSelect from "../components/layout/ScenarioSelect";
+import ScenarioPicker from "../components/layout/ScenarioPicker";
 import WorldCanvas from "../three/WorldCanvas";
 import RouteRenderer from "../three/RouteRenderer";
 import DroneParamPanel from "../components/planning/DroneParamPanel";
@@ -41,7 +41,7 @@ export default function RoutePlanningPage() {
     <>
       <SidebarHeader eyebrow="Route Planning · 航线规划" title={baseScenario.name} />
       <SidebarSection title="农田场景">
-        <ScenarioSelect />
+        <ScenarioPicker />
       </SidebarSection>
       <SidebarSection title="无人机参数">
         <DroneParamPanel />
@@ -77,9 +77,14 @@ export default function RoutePlanningPage() {
         <RouteRenderer plan={selectedResult} />
       </WorldCanvas>
       {planning && (
-        <div className="plan-loading">
-          <div className="plan-spinner" />
+        <div className="plan-loading" role="status" aria-live="polite">
+          <div className="plan-tilling" aria-hidden="true">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />
+            ))}
+          </div>
           <span className="mono">正在后台求解航线…</span>
+          <span className="plan-loading__sub">Web Worker · 元启法迭代中</span>
         </div>
       )}
     </Workspace>

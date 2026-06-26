@@ -12,10 +12,10 @@ interface Row {
 
 const ROWS: Row[] = [
   { key: "speed", label: "飞行速度", unit: "m/s", min: 1, max: 30, step: 1 },
-  { key: "seedCapacity", label: "种箱容量", unit: "", min: 50, max: 400, step: 10 },
+  { key: "seedCapacity", label: "种箱容量", unit: "粒", min: 50, max: 400, step: 10 },
   { key: "batteryDistance", label: "电池航程", unit: "m", min: 200, max: 1500, step: 20 },
   { key: "seedWidth", label: "播种幅宽", unit: "m", min: 2, max: 10, step: 0.5 },
-  { key: "seedRate", label: "单位种子量", unit: "/m", min: 0.5, max: 3, step: 0.1 },
+  { key: "seedRate", label: "单位种子量", unit: "粒/m", min: 0.5, max: 3, step: 0.1 },
 ];
 
 /** 无人机参数配置（改幅宽/种子量会重算航带） */
@@ -30,8 +30,8 @@ export default function DroneParamPanel() {
           <span className="param-row__label">
             {r.label}
             <span className="param-row__val mono">
-              {drone[r.key]}
-              {r.unit}
+              <span className="param-row__num">{drone[r.key]}</span>
+              <span className="param-row__unit">{r.unit}</span>
             </span>
           </span>
           <input

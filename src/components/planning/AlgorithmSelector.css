@@ -1,0 +1,77 @@
+.algo-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.algo-pill {
+  position: relative;
+  text-align: left;
+  padding: 9px 11px 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  transition: border-color 0.16s var(--ease-soft), background 0.16s var(--ease-soft),
+    transform 0.16s var(--ease-soft), box-shadow 0.16s var(--ease-soft);
+}
+
+.algo-pill:hover {
+  border-color: var(--leaf-soft);
+  background: rgba(90, 125, 79, 0.08);
+  transform: translateY(-1px);
+}
+
+.algo-pill.is-active {
+  border-color: var(--leaf);
+  background: rgba(90, 125, 79, 0.16);
+  color: var(--leaf-deep);
+  box-shadow: 0 4px 12px -8px rgba(63, 92, 55, 0.5);
+}
+
+.algo-pill__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.algo-pill__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.94rem;
+  line-height: 1.2;
+}
+
+.algo-pill__kind {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.algo-pill.is-active .algo-pill__kind {
+  color: var(--leaf-deep);
+}
+
+.algo-pill__pk {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--seed-gold), var(--seed-gold-deep));
+  padding: 1px 5px;
+  border-radius: 5px;
+  line-height: 1.4;
+}
+
+@media (max-width: 320px) {
+  .algo-selector {
+    grid-template-columns: 1fr;
+  }
+}

@@ -44,24 +44,24 @@ function PolePoint({ o, pos }: { o: Obstacle; pos: Point2D }) {
       {/* 杆体 */}
       <mesh position={[0, h / 2, 0]} castShadow>
         <cylinderGeometry args={isTower ? [1.0, 1.9, h, 8] : [0.32, 0.46, h, 10]} />
-        <meshStandardMaterial color={isTower ? "#8a8f96" : "#cfcfcf"} roughness={0.8} metalness={isTower ? 0.4 : 0.1} />
+        <meshStandardMaterial color={isTower ? "#8a8f96" : "#cfcfcf"} roughness={0.45} metalness={isTower ? 0.65 : 0.25} />
       </mesh>
       {/* 横担 */}
       <mesh position={[0, h - 0.8, 0]} castShadow>
         <boxGeometry args={[isTower ? 6 : 3.2, 0.22, 0.32]} />
-        <meshStandardMaterial color={isTower ? "#71767d" : "#b9b9b9"} roughness={0.85} metalness={0.3} />
+        <meshStandardMaterial color={isTower ? "#71767d" : "#b9b9b9"} roughness={0.5} metalness={0.55} />
       </mesh>
       {/* 绝缘子 */}
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (isTower ? 2.6 : 1.4), h - 0.55, 0]} castShadow>
           <cylinderGeometry args={[0.12, 0.16, 0.4, 8]} />
-          <meshStandardMaterial color="#e8e4da" roughness={0.6} metalness={0.1} />
+          <meshStandardMaterial color="#e8e4da" roughness={0.45} metalness={0.2} />
         </mesh>
       ))}
       {isTower && (
         <mesh position={[0, h - 2.4, 0]} castShadow>
           <boxGeometry args={[4.6, 0.22, 0.32]} />
-          <meshStandardMaterial color="#71767d" roughness={0.85} metalness={0.3} />
+          <meshStandardMaterial color="#71767d" roughness={0.5} metalness={0.55} />
         </mesh>
       )}
     </group>

@@ -21,6 +21,25 @@
   --line: rgba(42, 38, 32, 0.12);
   --line-strong: rgba(42, 38, 32, 0.24);
 
+  /* 语义色（统一散落硬编码：危险/信息/成功） */
+  --danger: #c75d4a;
+  --danger-deep: #b53f2c;
+  --danger-soft: rgba(199, 93, 74, 0.14);
+  --info: #2c5fb8;
+  --info-soft: #4b86d8;
+  --info-bg: rgba(59, 130, 246, 0.16);
+  --success: #3f5c37;
+  --success-soft: rgba(90, 125, 79, 0.14);
+  --warning: #bd8826;
+  --warning-soft: rgba(217, 164, 65, 0.18);
+
+  /* 视口/场景底色 */
+  --stage-bg: #cdd6cf;
+  --paper-card: #fdfcf6;
+
+  /* 统一缓动曲线 */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
   /* 字体 */
   --font-display: "Fraunces", "Noto Serif SC", Georgia, serif;
   --font-body: "Hanken Grotesk", "Noto Sans SC", system-ui, sans-serif;
@@ -263,7 +282,7 @@ button {
 
 .reveal {
   opacity: 0;
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: rise 0.7s var(--ease-soft) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Icon, type IconName } from "../components/common/icons";
 import "./Guide.css";
 
 interface FlowStep {
@@ -60,17 +61,17 @@ const PAGES: PageCard[] = [
 ];
 
 interface ConsoleKey {
-  icon: string;
+  icon: IconName;
   name: string;
   desc: string;
 }
 const CONSOLE_KEYS: ConsoleKey[] = [
-  { icon: "▶", name: "开始 / 继续", desc: "启动模拟，暂停后再次点击继续，完成后变为重新开始。" },
-  { icon: "⏸", name: "暂停", desc: "运行中点击暂停飞行，无人机原地保持。" },
-  { icon: "↻", name: "重置", desc: "回到初始状态，无人机返回补给点、清空已播种航带。" },
-  { icon: "⏪", name: "减速", desc: "降低播放倍速（0.5× / 1× / 2× / 4×）。" },
-  { icon: "⏩", name: "加速", desc: "提高播放倍速，便于快速浏览整段任务。" },
-  { icon: "←", name: "返回规划", desc: "回到航线规划页，调整参数或重新求解。" },
+  { icon: "play", name: "开始 / 继续", desc: "启动模拟，暂停后再次点击继续，完成后变为重新开始。" },
+  { icon: "pause", name: "暂停", desc: "运行中点击暂停飞行，无人机原地保持。" },
+  { icon: "reset", name: "重置", desc: "回到初始状态，无人机返回补给点、清空已播种航带。" },
+  { icon: "slower", name: "减速", desc: "降低播放倍速（0.5× / 1× / 2× / 4×）。" },
+  { icon: "faster", name: "加速", desc: "提高播放倍速，便于快速浏览整段任务。" },
+  { icon: "back", name: "返回规划", desc: "回到航线规划页，调整参数或重新求解。" },
 ];
 
 interface AlgoItem {
@@ -218,7 +219,7 @@ export default function GuidePage() {
               style={{ animationDelay: `${0.04 + i * 0.05}s` }}
             >
               <span className="g-key__icon" aria-hidden="true">
-                {k.icon}
+                <Icon name={k.icon} size={20} />
               </span>
               <div className="g-key__text">
                 <span className="g-key__name">{k.name}</span>

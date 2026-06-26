@@ -11,8 +11,48 @@ export default function TopBar({ status = "未加载场景" }: TopBarProps) {
   return (
     <header className="topbar">
       <div className="topbar__inner">
-        <NavLink to="/" className="topbar__brand">
-          <span className="topbar__mark" aria-hidden="true" />
+        <NavLink to="/" className="topbar__brand" aria-label="返回首页">
+          <svg
+            className="topbar__mark"
+            width="22"
+            height="22"
+            viewBox="0 0 22 22"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="tbMark" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="var(--leaf)" />
+                <stop offset="100%" stopColor="var(--seed-gold)" />
+              </linearGradient>
+            </defs>
+            <rect
+              x="1"
+              y="1"
+              width="20"
+              height="20"
+              rx="6"
+              fill="url(#tbMark)"
+              opacity="0.18"
+            />
+            <path
+              d="M4.5 14.5 H17.5"
+              stroke="var(--leaf-deep)"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              className="topbar__mark-path"
+            />
+            <path
+              d="M4.5 14.5 V8 H9.5 V11 H14 V6"
+              stroke="var(--seed-gold-deep)"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              strokeDasharray="2.4 2.4"
+              className="topbar__mark-route"
+            />
+            <circle cx="4.5" cy="14.5" r="1.7" fill="var(--leaf-deep)" />
+          </svg>
           <span className="topbar__name">空中农夫</span>
         </NavLink>
 
@@ -25,7 +65,7 @@ export default function TopBar({ status = "未加载场景" }: TopBarProps) {
                 "topbar__link" + (isActive ? " is-active" : "")
               }
             >
-              {item.label}
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>

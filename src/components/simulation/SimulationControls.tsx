@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { simStore } from "../../simulation/simStore";
 import type { SimulationPlaybackState, SimulationStatus } from "../../types/domain";
+import { Icon, type IconName } from "../common/icons";
 
 interface Props {
   speed: number;
@@ -18,10 +19,10 @@ function toPlayback(status: SimulationStatus | undefined): SimulationPlaybackSta
   return "running";
 }
 
-function primaryIcon(state: SimulationPlaybackState): string {
-  if (state === "running") return "⏸";
-  if (state === "completed") return "↻";
-  return "▶";
+function primaryIcon(state: SimulationPlaybackState): IconName {
+  if (state === "running") return "pause";
+  if (state === "completed") return "reset";
+  return "play";
 }
 function primaryLabel(state: SimulationPlaybackState): string {
   if (state === "idle") return "开始模拟";
@@ -44,12 +45,12 @@ export default function SimulationControls({
   return (
     <div className="sim-console" role="toolbar" aria-label="仿真控制台">
       <button className="sim-btn sim-btn--ghost" title="返回航线规划" aria-label="返回航线规划" onClick={onBack}>
-        ←
+        <Icon name="back" size={18} />
       </button>
       <span className="sim-sep" />
 
       <button className="sim-btn" title="减速" aria-label="减速" onClick={onSpeedDown}>
-        ⏪
+        <Icon name="slower" size={18} />
       </button>
       <button
         className="sim-btn sim-btn--primary"
@@ -57,10 +58,10 @@ export default function SimulationControls({
         aria-label={primaryLabel(state)}
         onClick={onToggle}
       >
-        {primaryIcon(state)}
+        <Icon name={primaryIcon(state)} size={22} />
       </button>
       <button className="sim-btn" title="加速" aria-label="加速" onClick={onSpeedUp}>
-        ⏩
+        <Icon name="faster" size={18} />
       </button>
       <span className="sim-speed mono" title="当前倍速">
         {speed}×
@@ -68,7 +69,7 @@ export default function SimulationControls({
 
       <span className="sim-sep" />
       <button className="sim-btn" title="重置" aria-label="重置" onClick={onReset}>
-        ↻
+        <Icon name="reset" size={18} />
       </button>
     </div>
   );
