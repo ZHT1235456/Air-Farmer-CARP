@@ -189,7 +189,7 @@ AirFarmer/
 
 ## 课程资料
 
-- [课程项目报告](docs/main.tex)
+- [课程项目报告](docs/main.pdf)
 - [算法 TypeScript 移植说明](docs/algorithm_porting_to_typescript.md)
 
 ## AI 工具使用说明
