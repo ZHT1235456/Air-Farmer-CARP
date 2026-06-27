@@ -120,7 +120,9 @@ npm run preview
 
 ### 桌面端运行
 
-安装 Rust 和 Tauri 平台依赖后执行：
+根目录下的 `air-farmer.exe` 双击即可直接运行，无需安装任何环境。
+
+如需从源码构建，安装 Rust 和 Tauri 平台依赖后执行：
 
 ```bash
 npm ci
