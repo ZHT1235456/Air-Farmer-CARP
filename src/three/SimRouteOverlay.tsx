@@ -5,7 +5,7 @@ import type { PlanResult, Strip } from "../types/domain";
 import { simStore } from "../simulation/simStore";
 import { segmentTransform, to3 } from "./coords";
 
-const SEEDED_Y = 0.1;
+const SEEDED_Y = 0.15;
 const CURRENT_Y = 0.16;
 const EDGE_Y = 0.2;
 const LABEL_Y = 4.5;

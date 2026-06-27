@@ -1,7 +1,7 @@
 import { useAppStore } from "../../store/appStore";
 import type { PlanOutput } from "../../algorithms";
 import { MODE_SHORT } from "./labels";
-import { compositeCost } from "./PlanResultPanel";
+import { compositeCost, bestResultIndex } from "./PlanResultPanel";
 
 const fmt = (n: number, d = 1) => n.toLocaleString("zh-CN", { maximumFractionDigits: d });
 
@@ -30,17 +30,7 @@ export default function AlgorithmCompareTable({ output }: { output: PlanOutput }
 
   const composites = output.results.map((_, i) => compositeCost(output, i));
   const precision = distinguishingPrecision(composites);
-
-  // 综合成本严格最小者最优；完全相等时取运行时间最短
-  let bestIdx = 0;
-  output.results.forEach((r, i) => {
-    const c = composites[i];
-    const bc = composites[bestIdx];
-    const better =
-      c < bc - EPS ||
-      (Math.abs(c - bc) <= EPS && r.runtimeMs < output.results[bestIdx].runtimeMs);
-    if (better) bestIdx = i;
-  });
+  const bestIdx = bestResultIndex(output);
 
   return (
     <div className="compare-wrap">

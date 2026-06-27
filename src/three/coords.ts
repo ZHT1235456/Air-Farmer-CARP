@@ -88,10 +88,11 @@ export function computeCameraPose(bounds: SceneBounds): CameraPose {
   const { center, size } = bounds;
   const cx = center.x;
   const cz = -center.y;
-  // 6 点钟方向（场景正南）斜俯视，俯角 45°：高度 = 水平距离
-  const d = size * 0.82;
+  // 6 点钟方向（场景正南）斜俯视，俯角 85°
+  const d = size * 1.2;
+  const zOffset = d / Math.tan((85 * Math.PI) / 180);
   return {
-    position: [cx, d, cz + d],
+    position: [cx, d, cz + zOffset],
     target: [cx, 1.5, cz],
     minDistance: size * 0.28,
     maxDistance: size * 2.8,

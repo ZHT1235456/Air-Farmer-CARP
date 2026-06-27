@@ -11,6 +11,21 @@ export function compositeCost(output: PlanOutput, index: number): number {
   return conv && conv.length ? conv[conv.length - 1].objective : NaN;
 }
 
+const EPS = 1e-9;
+
+/** 综合成本严格最小者最优；完全相等时取运行时间最短 */
+export function bestResultIndex(output: PlanOutput): number {
+  let best = 0;
+  output.results.forEach((r, i) => {
+    const c = compositeCost(output, i);
+    const bc = compositeCost(output, best);
+    if (c < bc - EPS || (Math.abs(c - bc) <= EPS && r.runtimeMs < output.results[best].runtimeMs)) {
+      best = i;
+    }
+  });
+  return best;
+}
+
 export default function PlanResultPanel() {
   const navigate = useNavigate();
   const output = useAppStore((s) => s.planOutput);
@@ -102,7 +117,8 @@ export default function PlanResultPanel() {
         <button
           className="btn-primary"
           onClick={() => {
-            setLastPlanResult(result);
+            const toSim = isCompare ? output.results[bestResultIndex(output)] : result;
+            setLastPlanResult(toSim);
             navigate("/simulation");
           }}
         >

@@ -35,7 +35,6 @@ const DroneModel = forwardRef<THREE.Group>(function DroneModel(_props, ref) {
     const e = state.clock.elapsedTime;
     if (craftRef.current) {
       craftRef.current.position.y = Math.sin(e * 2.2) * 0.06;
-      craftRef.current.rotation.z = Math.sin(e * 1.3) * 0.01;
     }
   });
 
@@ -113,7 +112,7 @@ const DroneModel = forwardRef<THREE.Group>(function DroneModel(_props, ref) {
               <group position={[mx, 0.24, mz]} ref={(el) => (propRefs.current[i] = el)}>
                 {/* 桨叶 */}
                 <mesh>
-                  <boxGeometry args={[1.7, 0.02, 0.14]} />
+                  <boxGeometry args={[1.7, 0.02, 0.04]} />
                   <meshPhysicalMaterial
                     color="#6f7679"
                     roughness={0.45}
@@ -124,7 +123,7 @@ const DroneModel = forwardRef<THREE.Group>(function DroneModel(_props, ref) {
                   />
                 </mesh>
                 <mesh rotation={[0, Math.PI / 2, 0]}>
-                  <boxGeometry args={[1.7, 0.02, 0.14]} />
+                  <boxGeometry args={[1.7, 0.02, 0.04]} />
                   <meshPhysicalMaterial
                     color="#6f7679"
                     roughness={0.45}
@@ -143,7 +142,6 @@ const DroneModel = forwardRef<THREE.Group>(function DroneModel(_props, ref) {
               <mesh
                 ref={(el) => (discRefs.current[i] = el)}
                 position={[mx, 0.24, mz]}
-                rotation={[-Math.PI / 2, 0, 0]}
               >
                 <cylinderGeometry args={[0.86, 0.86, 0.012, 28]} />
                 <meshStandardMaterial

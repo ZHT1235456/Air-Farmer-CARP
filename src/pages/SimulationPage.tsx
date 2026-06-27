@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 import { useAppStore, useCurrentScenario } from "../store/appStore";
@@ -81,11 +81,14 @@ export default function SimulationPage() {
     </>
   );
 
+  const snap = useSyncExternalStore(simStore.subscribe, simStore.get, simStore.get);
+  const seededIds = snap?.seededStripIds;
+
   const right = <SimulationDashboard drone={drone} algorithmLabel={algorithmLabel} />;
 
   return (
     <Workspace left={left} right={right}>
-      <WorldCanvas scenario={effectiveScenario} stripInteractive={false}>
+      <WorldCanvas scenario={effectiveScenario} stripInteractive={false} seededIds={seededIds}>
         <SimRouteOverlay plan={plan} />
         <DroneModel ref={droneRef} />
         <SeedingEffect emitterRef={emitterRef} activeRef={activeRef} />
