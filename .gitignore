@@ -33,6 +33,10 @@ Thumbs.db
 *.bbl
 *.blg
 
-assets/
+assets/*
+!assets/首页.png
+!assets/场景预览.png
+!assets/航线规划.png
+!assets/播种模拟.png
 
 references/
