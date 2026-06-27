@@ -32,3 +32,5 @@ Thumbs.db
 *.synctex.gz
 *.bbl
 *.blg
+
+assets/
